@@ -1,0 +1,32 @@
+version: '4'
+
+services:
+  backend:
+    image: radio:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      tags:
+        - radio:latest
+    container_name: radio
+    ports:
+      - "8080:8080"
+    depends_on: 
+      - database
+
+  database:
+    image: postgres:13.3
+    restart: always
+    environment:
+      POSTGRES_DB: "radio"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "password"
+    volumes:
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres-data:/var/lib/postgresql/data
+    hostname: postgres
+    ports:
+      - "5432:5432"
+      
+volumes:
+  postgres-data:

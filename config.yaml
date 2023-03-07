@@ -1,0 +1,18 @@
+port: 8080
+
+jwt:
+  secret_key: "secret_key"
+
+database:
+  host: "postgres"
+  port: 5432
+  dbname: "radio"
+  user: "admin"
+  password: "password"
+
+email:
+    from: "inbox@netradio.com"
+    user: "fc48c3918d5073"
+    password: "89747df89e72fa"
+    host: "sandbox.smtp.mailtrap.io"
+    port: 2525
