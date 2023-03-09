@@ -13,5 +13,5 @@ func RoutePaths(
 	musicService repository.MusicDB,
 ) {
 	//addJSONHandler(core, router, "GET", "/podcast/all", newGetterHandler(musicService))
-	router.Method("GET", "/podcast/{podcastID}/start", handlers.MakeHandler(PodacstGetter, core))
+	router.Method("POST", "/podcast/{podcastID}/start", handlers.MakeHandler(PodacstGetter, core))
 }

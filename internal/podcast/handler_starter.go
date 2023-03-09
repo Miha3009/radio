@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"netradio/internal/controller/requests"
 	"netradio/internal/model"
 	"netradio/internal/repository"
 	"netradio/pkg/context"
@@ -48,6 +49,11 @@ func PodacstGetter(context context.Context) (any, error) {
 		return nil, err
 	}
 
+	_, err = pc.AddTrack(audioTrack)
+	if err != nil {
+		panic(err)
+	}
+
 	err = pc.SetRemoteDescription(*offer)
 	if err != nil {
 		return nil, err
@@ -71,18 +77,20 @@ func PodacstGetter(context context.Context) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	pc.AddTrack(audioTrack)
 	return nil, nil
 }
 
 func readOffer(reader io.Reader) (*webrtc.SessionDescription, error) {
+	var request requests.PodcastStartRequest
 	dec := json.NewDecoder(reader)
-	var offer webrtc.SessionDescription
-	err := dec.Decode(&offer)
+	err := dec.Decode(&request)
 	if err != nil {
 		return nil, err
 	}
 
+	var offer webrtc.SessionDescription
+	offer.SDP = request.SDP
+	offer.Type = webrtc.SDPTypeOffer
 	if offer.Type != webrtc.SDPTypeOffer {
 		return nil, fmt.Errorf("received SDP is not an offer")
 	}
