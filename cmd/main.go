@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 
 	"netradio/internal/adminpanel"
 	"netradio/internal/controller"
@@ -47,6 +48,13 @@ func main() {
 	userDB := repository.NewUserDB()
 
 	router := chi.NewRouter()
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*", "*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"X-PINGOTHER", "Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 
 	core := handlers.NewCore(logger, userDB)
 	adminpanel.RoutePaths(core, router, newsDB, musicDB)
