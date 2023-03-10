@@ -13,6 +13,7 @@ type RegisterRequest struct {
 
 type RefreshRequest struct {
 	RefreshToken string
+	IP           string
 }
 
 type LogoutRequest struct {

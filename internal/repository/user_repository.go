@@ -10,10 +10,10 @@ import (
 type UserDB interface {
 	GetUserByEmail(email string) (*model.User, error)
 	GetUserById(id string) (*model.User, error)
-	GetSessionByRefreshToken(refreshToken string) (*model.Session, error)
+	GetSessionsByRefreshToken(refreshToken string) ([]model.Session, error)
 	GetVerificationCodeByEmail(email string) (*model.VerificationCode, error)
 	CreateUser(user model.User) error
-	CreateSession(userID int, refreshToken string, expires time.Time) error
+	CreateSession(userID int, refreshToken string, expires time.Time, ip string) error
 	CreateVerificationCode(code model.VerificationCode) error
 	ChangeName(id, newName string) error
 	ChangeAvatar(id, newAvatar string) error
@@ -61,18 +61,22 @@ func (db *UserDBImpl) GetUserById(id string) (*model.User, error) {
 	return nil, nil
 }
 
-func (db *UserDBImpl) GetSessionByRefreshToken(refreshToken string) (*model.Session, error) {
-	var res model.Session
-	rows, err := db.conn.Query("SELECT userid, refresh_token, expires FROM sessions WHERE refresh_token=$1", refreshToken)
+func (db *UserDBImpl) GetSessionsByRefreshToken(refreshToken string) ([]model.Session, error) {
+	res := make([]model.Session, 0)
+	rows, err := db.conn.Query("SELECT userid, refresh_token, expires, ip FROM sessions WHERE refresh_token=$1", refreshToken)
 	if err != nil {
-		return &res, err
+		return res, err
 	}
-	if rows.Next() {
-		err = rows.Scan(&res.UserID, &res.RefreshToken, &res.Expires)
-		return &res, err
+	for rows.Next() {
+		var temp model.Session
+		err = rows.Scan(&temp.UserID, &temp.RefreshToken, &temp.Expires, &temp.IP)
+		if err != nil {
+			return res, err
+		}
+		res = append(res, temp)
 	}
 
-	return nil, nil
+	return res, nil
 }
 
 func (db *UserDBImpl) GetVerificationCodeByEmail(email string) (*model.VerificationCode, error) {
@@ -94,8 +98,8 @@ func (db *UserDBImpl) CreateUser(user model.User) error {
 	return err
 }
 
-func (db *UserDBImpl) CreateSession(userID int, refreshToken string, expires time.Time) error {
-	_, err := db.conn.Query("INSERT INTO sessions (userid, refresh_token, expires) VALUES ($1, $2, $3) ON CONFLICT (userid) DO UPDATE SET refresh_token=EXCLUDED.refresh_token, expires=EXCLUDED.expires", userID, refreshToken, expires)
+func (db *UserDBImpl) CreateSession(userID int, refreshToken string, expires time.Time, ip string) error {
+	_, err := db.conn.Query("INSERT INTO sessions (userid, refresh_token, expires, ip) VALUES ($1, $2, $3, $4) ON CONFLICT (userid, ip) DO UPDATE SET refresh_token=EXCLUDED.refresh_token, expires=EXCLUDED.expires", userID, refreshToken, expires, ip)
 	return err
 }
 

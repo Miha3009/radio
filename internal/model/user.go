@@ -22,6 +22,7 @@ const (
 type Session struct {
 	UserID       int
 	RefreshToken string
+	IP           string
 	Expires      time.Time
 }
 

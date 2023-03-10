@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
 	"netradio/internal/controller/requests"
 	"netradio/internal/model"
@@ -36,7 +37,7 @@ func HandleRegister(ctx context.Context) (any, error) {
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
 	}
 
 	return res, nil
@@ -63,7 +64,7 @@ func HandleLogin(ctx context.Context) (any, error) {
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
 	}
 
 	return res, nil
@@ -83,6 +84,13 @@ func HandleRefresh(ctx context.Context) (any, error) {
 		return nil, nil
 	}
 
+	ip, _, err := net.SplitHostPort(ctx.GetRequest().RemoteAddr)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, nil
+	}
+	request.IP = ip
+
 	res, userID, err := service.NewUserService().Refresh(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
@@ -95,7 +103,7 @@ func HandleRefresh(ctx context.Context) (any, error) {
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
 	}
 
 	return res, nil
@@ -180,7 +188,7 @@ func HandleResetPasswordVerifyCode(ctx context.Context) (any, error) {
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
 	}
 
 	return res, nil

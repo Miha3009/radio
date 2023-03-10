@@ -97,14 +97,22 @@ func (s *UserServiceImpl) Login(r requests.LoginRequest) (responses.LoginRespons
 
 func (s *UserServiceImpl) Refresh(r requests.RefreshRequest) (responses.RefreshResponse, int, error) {
 	var res responses.RefreshResponse
-	session, err := s.db.GetSessionByRefreshToken(r.RefreshToken)
+	sessions, err := s.db.GetSessionsByRefreshToken(r.RefreshToken)
 	if err != nil {
 		return res, 0, err
+	}
+
+	var session *model.Session
+	for i := range sessions {
+		if sessions[i].IP == r.IP {
+			session = &sessions[i]
+		}
 	}
 	if session == nil {
 		res.Error = errors.SessionNotFound
 		return res, 0, nil
 	}
+
 	if session.Expires.Before(time.Now()) {
 		err = s.db.DeleteSession(strconv.Itoa(session.UserID))
 		if err != nil {

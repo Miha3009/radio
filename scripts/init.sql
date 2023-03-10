@@ -8,9 +8,11 @@ CREATE TABLE users (
 );
 
 CREATE TABLE sessions (
-	userid INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+	userid INT REFERENCES users(id) ON DELETE CASCADE,
+	ip VARCHAR(32),
 	refresh_token VARCHAR(255),
-	expires TIMESTAMP
+	expires TIMESTAMP,
+	PRIMARY KEY (userid, ip)
 );
 
 CREATE TABLE verification_codes (

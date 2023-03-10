@@ -3,6 +3,7 @@ package jwt
 import (
 	"errors"
 	"math/rand"
+	"net"
 	"net/http"
 	"netradio/internal/repository"
 	"strconv"
@@ -46,10 +47,11 @@ func NewRefreshToken() string {
 	return string(b)
 }
 
-func AddRefreshTokenToCookie(w http.ResponseWriter, userID int) {
+func AddRefreshTokenToCookie(w http.ResponseWriter, r *http.Request, userID int) {
 	refreshToken := NewRefreshToken()
 	expires := time.Now().Add(RefreshTokenTTL)
-	repository.NewUserDB().CreateSession(userID, refreshToken, expires)
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	repository.NewUserDB().CreateSession(userID, refreshToken, expires, ip)
 	http.SetCookie(w, &http.Cookie{Name: "refreshToken", Value: refreshToken, Expires: expires})
 }
 
