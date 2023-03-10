@@ -14,13 +14,13 @@ import (
 )
 
 type UserService interface {
-	Register(r requests.RegisterRequest) (responses.RegisterResponse, int, error)
-	Login(r requests.LoginRequest) (responses.LoginResponse, int, error)
-	Refresh(r requests.RefreshRequest) (responses.RefreshResponse, int, error)
+	Register(r requests.RegisterRequest) (responses.RegisterResponse, error)
+	Login(r requests.LoginRequest) (responses.LoginResponse, error)
+	Refresh(r requests.RefreshRequest) (responses.RefreshResponse, error)
 	Logout(r requests.LogoutRequest) error
 	DeleteUser(r requests.DeleteUserRequset) error
 	ResetPasswordSendCode(r requests.ResetPasswordSendCodeRequest) error
-	ResetPasswordVerifyCode(r requests.ResetPasswordVerifyCodeRequest) (responses.ResetPasswordVerifyCodeResponse, int, error)
+	ResetPasswordVerifyCode(r requests.ResetPasswordVerifyCodeRequest) (responses.ResetPasswordVerifyCodeResponse, error)
 	ResetPasswordChange(r requests.ResetPasswordChangeRequest) (responses.ResetPasswordChangeResponse, error)
 }
 
@@ -34,29 +34,29 @@ type UserServiceImpl struct {
 	db repository.UserDB
 }
 
-func (s *UserServiceImpl) Register(r requests.RegisterRequest) (responses.RegisterResponse, int, error) {
+func (s *UserServiceImpl) Register(r requests.RegisterRequest) (responses.RegisterResponse, error) {
 	var res responses.RegisterResponse
 	if !util.IsEmailValid(r.Email) {
 		res.Error = errors.InvalidEmail
-		return res, 0, nil
+		return res, nil
 	}
 	if !util.IsPasswordValid(r.Password) {
 		res.Error = errors.InvalidPassword
-		return res, 0, nil
+		return res, nil
 	}
 
 	user, err := s.db.GetUserByEmail(r.Email)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 	if user != nil {
 		res.Error = errors.UserAlreadyExist
-		return res, 0, nil
+		return res, nil
 	}
 
 	hashedPassword, err := util.HashPassword(r.Password)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 
 	var newUser model.User
@@ -66,40 +66,42 @@ func (s *UserServiceImpl) Register(r requests.RegisterRequest) (responses.Regist
 	newUser.Role = model.UserRegistered
 	err = s.db.CreateUser(newUser)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 
 	user, err = s.db.GetUserByEmail(r.Email)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
+	res.UserID = user.ID
 
-	return res, user.ID, err
+	return res, err
 }
 
-func (s *UserServiceImpl) Login(r requests.LoginRequest) (responses.LoginResponse, int, error) {
+func (s *UserServiceImpl) Login(r requests.LoginRequest) (responses.LoginResponse, error) {
 	var res responses.LoginResponse
 	user, err := s.db.GetUserByEmail(r.Email)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 	if user == nil {
 		res.Error = errors.UserNotFound
-		return res, 0, err
+		return res, err
 	}
 	if !util.CheckPassword(r.Password, user.Password) {
 		res.Error = errors.WrongPassword
-		return res, 0, err
+		return res, err
 	}
+	res.UserID = user.ID
 
-	return res, user.ID, err
+	return res, err
 }
 
-func (s *UserServiceImpl) Refresh(r requests.RefreshRequest) (responses.RefreshResponse, int, error) {
+func (s *UserServiceImpl) Refresh(r requests.RefreshRequest) (responses.RefreshResponse, error) {
 	var res responses.RefreshResponse
 	sessions, err := s.db.GetSessionsByRefreshToken(r.RefreshToken)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 
 	var session *model.Session
@@ -110,19 +112,20 @@ func (s *UserServiceImpl) Refresh(r requests.RefreshRequest) (responses.RefreshR
 	}
 	if session == nil {
 		res.Error = errors.SessionNotFound
-		return res, 0, nil
+		return res, nil
 	}
 
 	if session.Expires.Before(time.Now()) {
 		err = s.db.DeleteSession(strconv.Itoa(session.UserID))
 		if err != nil {
-			return res, 0, err
+			return res, err
 		}
 		res.Error = errors.SessionExpired
-		return res, 0, nil
+		return res, nil
 	}
+	res.UserID = session.UserID
 
-	return res, session.UserID, err
+	return res, err
 }
 
 func (s *UserServiceImpl) Logout(r requests.LogoutRequest) error {
@@ -154,38 +157,39 @@ func (s *UserServiceImpl) ResetPasswordSendCode(r requests.ResetPasswordSendCode
 	return nil
 }
 
-func (s *UserServiceImpl) ResetPasswordVerifyCode(r requests.ResetPasswordVerifyCodeRequest) (responses.ResetPasswordVerifyCodeResponse, int, error) {
+func (s *UserServiceImpl) ResetPasswordVerifyCode(r requests.ResetPasswordVerifyCodeRequest) (responses.ResetPasswordVerifyCodeResponse, error) {
 	var res responses.ResetPasswordVerifyCodeResponse
 	code, err := s.db.GetVerificationCodeByEmail(r.Email)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 
 	if code == nil || code.Value != r.Code {
 		res.Error = errors.WrongCode
-		return res, 0, nil
+		return res, nil
 	}
 
 	err = s.db.DeleteVerificationCode(r.Email)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 
 	if code.Expires.Before(time.Now()) {
 		res.Error = errors.CodeExpires
-		return res, 0, nil
+		return res, nil
 	}
 
 	user, err := s.db.GetUserByEmail(r.Email)
 	if err != nil {
-		return res, 0, err
+		return res, err
 	}
 	if user == nil {
 		res.Error = errors.UserNotFound
-		return res, 0, nil
+		return res, nil
 	}
+	res.UserID = user.ID
 
-	return res, user.ID, nil
+	return res, nil
 }
 
 func (s *UserServiceImpl) ResetPasswordChange(r requests.ResetPasswordChangeRequest) (responses.ResetPasswordChangeResponse, error) {

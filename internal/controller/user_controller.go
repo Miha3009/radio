@@ -25,19 +25,19 @@ func HandleRegister(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	res, userID, err := service.NewUserService().Register(request)
+	res, err := service.NewUserService().Register(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 	if res.Error == "" {
-		accessToken, err := jwt.NewAccessToken(userID)
+		accessToken, err := jwt.NewAccessToken(res.UserID)
 		if err != nil {
 			ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
 	}
 
 	return res, nil
@@ -52,19 +52,19 @@ func HandleLogin(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	res, userID, err := service.NewUserService().Login(request)
+	res, err := service.NewUserService().Login(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 	if res.Error == "" {
-		accessToken, err := jwt.NewAccessToken(userID)
+		accessToken, err := jwt.NewAccessToken(res.UserID)
 		if err != nil {
 			ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
 	}
 
 	return res, nil
@@ -91,19 +91,19 @@ func HandleRefresh(ctx context.Context) (any, error) {
 	}
 	request.IP = ip
 
-	res, userID, err := service.NewUserService().Refresh(request)
+	res, err := service.NewUserService().Refresh(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return res, err
 	}
 	if res.Error == "" {
-		accessToken, err := jwt.NewAccessToken(userID)
+		accessToken, err := jwt.NewAccessToken(res.UserID)
 		if err != nil {
 			ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
 	}
 
 	return res, nil
@@ -176,19 +176,19 @@ func HandleResetPasswordVerifyCode(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	res, userID, err := service.NewUserService().ResetPasswordVerifyCode(request)
+	res, err := service.NewUserService().ResetPasswordVerifyCode(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 	if res.Error == "" {
-		accessToken, err := jwt.NewAccessToken(userID)
+		accessToken, err := jwt.NewAccessToken(res.UserID)
 		if err != nil {
 			ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 			return nil, err
 		}
 		res.AccessToken = accessToken
-		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), userID)
+		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
 	}
 
 	return res, nil
