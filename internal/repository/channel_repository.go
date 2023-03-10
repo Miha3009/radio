@@ -12,6 +12,7 @@ type ChannelDB interface {
 	CreateChannel(channel model.ChannelInfo) error
 	UpdateChannel(channel model.ChannelInfo) error
 	DeleteChannel(id string) error
+	ChangeChannelStatus(id string, status model.ChannelStatus) error
 }
 
 func NewChannelDB() ChannelDB {
@@ -26,7 +27,7 @@ type ChannelDBImpl struct {
 
 func (db *ChannelDBImpl) GetChannels() ([]model.ChannelShortInfo, error) {
 	res := make([]model.ChannelShortInfo, 0)
-	rows, err := db.conn.Query("SELECT id, title FROM channels")
+	rows, err := db.conn.Query("SELECT id, title FROM channels WHERE status=$1", model.ActiveChannel)
 	if err != nil {
 		return res, err
 	}
@@ -68,5 +69,10 @@ func (db *ChannelDBImpl) UpdateChannel(channel model.ChannelInfo) error {
 
 func (db *ChannelDBImpl) DeleteChannel(id string) error {
 	_, err := db.conn.Exec("DELETE FROM channels WHERE id=$1", id)
+	return err
+}
+
+func (db *ChannelDBImpl) ChangeChannelStatus(id string, status model.ChannelStatus) error {
+	_, err := db.conn.Exec("UPDATE channels SET status=$1 WHERE id=$2", status, id)
 	return err
 }

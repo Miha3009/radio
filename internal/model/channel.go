@@ -10,8 +10,8 @@ type ChannelInfo struct {
 type ChannelStatus int
 
 const (
-	ActiveChannel  ChannelStatus = 0
-	StoppedChannel               = 1
+	StoppedChannel ChannelStatus = 0
+	ActiveChannel                = 1
 )
 
 type ChannelShortInfo struct {

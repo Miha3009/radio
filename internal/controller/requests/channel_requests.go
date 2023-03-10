@@ -18,3 +18,11 @@ type UpdateChannelRequest struct {
 type DeleteChannelRequest struct {
 	ID string
 }
+
+type StartChannelRequest struct {
+	ID string
+}
+
+type StopChannelRequest struct {
+	ID string
+}

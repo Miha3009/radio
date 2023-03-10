@@ -14,6 +14,8 @@ type ChannelService interface {
 	CreateChannel(r requests.CreateChannelRequest) error
 	DeleteChannel(r requests.DeleteChannelRequest) error
 	UpdateChannel(r requests.UpdateChannelRequest) (responses.UpdateChannelResponse, error)
+	StartChannel(r requests.StartChannelRequest) error
+	StopChannel(r requests.StopChannelRequest) error
 }
 
 func NewChannelService() ChannelService {
@@ -53,6 +55,7 @@ func (s *ChannelServiceImpl) GetChannel(r requests.GetChannelRequest) (responses
 	res.ID = strconv.Itoa(channel.ID)
 	res.Title = channel.Title
 	res.Description = channel.Description
+	res.Status = int(channel.Status)
 
 	return res, nil
 }
@@ -94,4 +97,12 @@ func (s *ChannelServiceImpl) UpdateChannel(r requests.UpdateChannelRequest) (res
 	}
 
 	return res, nil
+}
+
+func (s *ChannelServiceImpl) StartChannel(r requests.StartChannelRequest) error {
+	return s.db.ChangeChannelStatus(r.ID, model.ActiveChannel)
+}
+
+func (s *ChannelServiceImpl) StopChannel(r requests.StopChannelRequest) error {
+	return s.db.ChangeChannelStatus(r.ID, model.StoppedChannel)
 }

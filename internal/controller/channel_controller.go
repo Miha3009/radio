@@ -111,6 +111,44 @@ func HandleUpdateChannel(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
+func HandleStartChannel(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.StartChannelRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	err := service.NewChannelService().StartChannel(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func HandleStopChannel(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.StopChannelRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	err := service.NewChannelService().StopChannel(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func RouteChannelPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -120,4 +158,6 @@ func RouteChannelPaths(
 	router.MethodFunc("PUT", "/channel/create", handlers.MakeHandler(HandleCreateChannel, core))
 	router.MethodFunc("DELETE", "/channel/{id}", handlers.MakeHandler(HandleDeleteChannel, core))
 	router.MethodFunc("PATCH", "/channel/{id}", handlers.MakeHandler(HandleUpdateChannel, core))
+	router.MethodFunc("POST", "/channel/{id}/start", handlers.MakeHandler(HandleStartChannel, core))
+	router.MethodFunc("POST", "/channel/{id}/stop", handlers.MakeHandler(HandleStopChannel, core))
 }
