@@ -50,7 +50,7 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*", "*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowedHeaders:   []string{"X-PINGOTHER", "Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
 		MaxAge:           300,
@@ -59,6 +59,7 @@ func main() {
 	core := handlers.NewCore(logger, userDB)
 	adminpanel.RoutePaths(core, router, newsDB, musicDB)
 	controller.RouteUserPaths(core, router)
+	controller.RouteChannelPaths(core, router)
 	controller.RouteNewsPaths(core, router)
 	podcast.RoutePaths(core, router, musicDB)
 
