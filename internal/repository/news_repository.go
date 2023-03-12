@@ -2,17 +2,17 @@ package repository
 
 import (
 	"database/sql"
-	"errors"
 	"netradio/internal/model"
 	"netradio/pkg/database"
-	"strconv"
 )
 
 type NewsDB interface {
-	Count() (int, error)
-	GetRange(offset, limit int) ([]model.News, error)
-	Get(id int) (model.News, error)
-	Add(news model.News) int
+	GetNewsCount() (int, error)
+	GetNewsList(offset, limit int) ([]model.NewsShortInfo, error)
+	GetNewsById(id string) (*model.News, error)
+	CreateNews(news model.News) error
+	UpdateNews(news model.News) error
+	DeleteNews(id string) error
 }
 
 func NewNewsDB() NewsDB {
@@ -25,44 +25,55 @@ type NewsDBImpl struct {
 	conn *sql.DB
 }
 
-func (db *NewsDBImpl) Count() (int, error) {
-	var count int
+func (db *NewsDBImpl) GetNewsCount() (int, error) {
+	count := 0
 	err := db.conn.QueryRow("SELECT COUNT(*) FROM news").Scan(&count)
-	if err != nil {
-		return 0, err
-	}
-
-	return count, nil
+	return count, err
 }
 
-func (db *NewsDBImpl) GetRange(offset, limit int) ([]model.News, error) {
-	rows, err := db.conn.Query("SELECT id, title, content FROM news ORDER BY time OFFSET $1 LIMIT $2", offset, limit)
+func (db *NewsDBImpl) GetNewsList(offset, limit int) ([]model.NewsShortInfo, error) {
+	res := make([]model.NewsShortInfo, 0)
+	rows, err := db.conn.Query("SELECT id, title, publication_date FROM news ORDER BY publication_date OFFSET $1 LIMIT $2", offset, limit)
 	if err != nil {
-		return nil, err
+		return res, err
 	}
-	defer rows.Close()
-
-	res := make([]model.News, 0)
 	for rows.Next() {
-		var row model.News
-		if err := rows.Scan(&row.ID, &row.Title, &row.Content); err != nil {
-			return nil, err
+		var temp model.NewsShortInfo
+		err = rows.Scan(&temp.ID, &temp.Title)
+		if err != nil {
+			return res, err
 		}
-		res = append(res, row)
+		res = append(res, temp)
 	}
+
 	return res, nil
 }
 
-func (db *NewsDBImpl) Get(id int) (model.News, error) {
+func (db *NewsDBImpl) GetNewsById(id string) (*model.News, error) {
 	var res model.News
-	err := db.conn.QueryRow("SELECT id, title, content FROM news WHERE id=$1", id).Scan(&res.ID, &res.Title, &res.Content)
+	rows, err := db.conn.Query("SELECT id, title, content, pubication_date FROM news WHERE id=$1", id)
 	if err != nil {
-		return res, errors.New("no news for id=" + strconv.Itoa(id))
+		return &res, err
+	}
+	if rows.Next() {
+		err = rows.Scan(&res.ID, &res.Title, &res.Content, &res.PublicationDate)
+		return &res, err
 	}
 
-	return res, nil
+	return nil, nil
 }
 
-func (ds *NewsDBImpl) Add(model model.News) int {
-	return model.ID
+func (db *NewsDBImpl) CreateNews(news model.News) error {
+	_, err := db.conn.Exec("INSERT INTO news (title, content, publication_date)  VALUES ($1, $2, $3)", news.Title, news.Content, news.PublicationDate)
+	return err
+}
+
+func (db *NewsDBImpl) UpdateNews(news model.News) error {
+	_, err := db.conn.Exec("UPDATE news SET title=$1, content=$2, publication_date=$3 WHERE id=$4", news.Title, news.Content, news.PublicationDate, news.ID)
+	return err
+}
+
+func (db *NewsDBImpl) DeleteNews(id string) error {
+	_, err := db.conn.Exec("DELETE FROM news WHERE id=$1", id)
+	return err
 }

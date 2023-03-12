@@ -53,7 +53,7 @@ func (db *TrackDBImpl) UpdateTrack(track model.Track) error {
 }
 
 func (db *TrackDBImpl) DeleteTrack(id string) error {
-	_, err := db.conn.Exec("DELETE FROM channels WHERE id=$1", id)
+	_, err := db.conn.Exec("DELETE FROM tracks WHERE id=$1", id)
 	return err
 }
 
