@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 
+	"netradio/internal/adminpanel"
 	"netradio/internal/controller"
 	"netradio/internal/podcast"
 	"netradio/internal/repository"
@@ -42,6 +43,7 @@ func main() {
 	jwt.SetConfig(cfg.Jwt)
 	email.SetConfig(cfg.Email)
 
+	newsDB := repository.NewNewsDB()
 	musicDB := repository.NewMusicDB()
 	userDB := repository.NewUserDB()
 
@@ -55,9 +57,9 @@ func main() {
 	}))
 
 	core := handlers.NewCore(logger, userDB)
+	adminpanel.RoutePaths(core, router, newsDB, musicDB)
 	controller.RouteUserPaths(core, router)
 	controller.RouteChannelPaths(core, router)
-	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
 	podcast.RoutePaths(core, router, musicDB)
 

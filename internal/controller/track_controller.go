@@ -8,25 +8,22 @@ import (
 	"netradio/internal/service"
 	"netradio/pkg/context"
 	"netradio/pkg/handlers"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func HandleGetChannels(ctx context.Context) (any, error) {
-	res, err := service.NewChannelService().GetChannels()
-	if err != nil {
-		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func HandleGetChannel(ctx context.Context) (any, error) {
-	var request requests.GetChannelRequest
+func HandleGetTrack(ctx context.Context) (any, error) {
+	var request requests.GetTrackRequest
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
 
-	res, err := service.NewChannelService().GetChannel(request)
+	user := ctx.GetUser()
+	if user.Role != model.UserGuest {
+		userId := strconv.Itoa(user.ID)
+		request.UserID = &userId
+	}
+
+	res, err := service.NewTrackService().GetTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
@@ -39,14 +36,14 @@ func HandleGetChannel(ctx context.Context) (any, error) {
 	return res, nil
 }
 
-func HandleCreateChannel(ctx context.Context) (any, error) {
+func HandleCreateTrack(ctx context.Context) (any, error) {
 	user := ctx.GetUser()
 	if user.Role != model.UserAdministrator {
 		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
 		return nil, nil
 	}
 
-	var request requests.CreateChannelRequest
+	var request requests.CreateTrackRequest
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
 	err := decoder.Decode(&request)
 	if err != nil {
@@ -54,7 +51,7 @@ func HandleCreateChannel(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	err = service.NewChannelService().CreateChannel(request)
+	err = service.NewTrackService().CreateTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
@@ -63,17 +60,17 @@ func HandleCreateChannel(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
-func HandleDeleteChannel(ctx context.Context) (any, error) {
+func HandleDeleteTrack(ctx context.Context) (any, error) {
 	user := ctx.GetUser()
 	if user.Role != model.UserAdministrator {
 		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
 		return nil, nil
 	}
 
-	var request requests.DeleteChannelRequest
+	var request requests.DeleteTrackRequest
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
 
-	err := service.NewChannelService().DeleteChannel(request)
+	err := service.NewTrackService().DeleteTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
@@ -82,14 +79,14 @@ func HandleDeleteChannel(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
-func HandleUpdateChannel(ctx context.Context) (any, error) {
+func HandleUpdateTrack(ctx context.Context) (any, error) {
 	user := ctx.GetUser()
 	if user.Role != model.UserAdministrator {
 		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
 		return nil, nil
 	}
 
-	var request requests.UpdateChannelRequest
+	var request requests.UpdateTrackRequest
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
 	err := decoder.Decode(&request)
@@ -98,7 +95,7 @@ func HandleUpdateChannel(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	res, err := service.NewChannelService().UpdateChannel(request)
+	res, err := service.NewTrackService().UpdateTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
@@ -111,17 +108,24 @@ func HandleUpdateChannel(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
-func HandleStartChannel(ctx context.Context) (any, error) {
+func HandleLikeTrack(ctx context.Context) (any, error) {
 	user := ctx.GetUser()
-	if user.Role != model.UserAdministrator {
+	if user.Role == model.UserGuest {
 		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
 		return nil, nil
 	}
 
-	var request requests.StartChannelRequest
+	var request requests.LikeTrackRequest
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.UserID = user.ID
 
-	err := service.NewChannelService().StartChannel(request)
+	err = service.NewTrackService().LikeTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
@@ -130,17 +134,24 @@ func HandleStartChannel(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
-func HandleStopChannel(ctx context.Context) (any, error) {
+func HandleCommentTrack(ctx context.Context) (any, error) {
 	user := ctx.GetUser()
-	if user.Role != model.UserAdministrator {
+	if user.Role == model.UserGuest {
 		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
 		return nil, nil
 	}
 
-	var request requests.StopChannelRequest
+	var request requests.CommentTrackRequest
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.UserID = user.ID
 
-	err := service.NewChannelService().StopChannel(request)
+	err = service.NewTrackService().CommentTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
@@ -149,15 +160,14 @@ func HandleStopChannel(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
-func RouteChannelPaths(
+func RouteTrackPaths(
 	core handlers.Core,
 	router chi.Router,
 ) {
-	router.MethodFunc("GET", "/channel", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetChannels), core))
-	router.MethodFunc("GET", "/channel/{id}", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetChannel), core))
-	router.MethodFunc("PUT", "/channel", handlers.MakeHandler(HandleCreateChannel, core))
-	router.MethodFunc("DELETE", "/channel/{id}", handlers.MakeHandler(HandleDeleteChannel, core))
-	router.MethodFunc("PATCH", "/channel/{id}", handlers.MakeHandler(HandleUpdateChannel, core))
-	router.MethodFunc("POST", "/channel/{id}/start", handlers.MakeHandler(HandleStartChannel, core))
-	router.MethodFunc("POST", "/channel/{id}/stop", handlers.MakeHandler(HandleStopChannel, core))
+	router.MethodFunc("GET", "/track/{id}", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetTrack), core))
+	router.MethodFunc("PUT", "/track", handlers.MakeHandler(HandleCreateTrack, core))
+	router.MethodFunc("DELETE", "/track/{id}", handlers.MakeHandler(HandleDeleteTrack, core))
+	router.MethodFunc("PATCH", "/track/{id}", handlers.MakeHandler(HandleUpdateTrack, core))
+	router.MethodFunc("POST", "/track/{id}/like", handlers.MakeHandler(HandleLikeTrack, core))
+	router.MethodFunc("POST", "/track/{id}/comment", handlers.MakeHandler(HandleCommentTrack, core))
 }
