@@ -37,3 +37,8 @@ type ResetPasswordChangeRequest struct {
 	NewPassword string `json:"newPassword"`
 	UserID      string
 }
+
+type UploadAvatarRequest struct {
+	UserID string
+	Avatar string
+}

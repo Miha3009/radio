@@ -20,6 +20,7 @@ type ChannelService interface {
 	StartChannel(r requests.StartChannelRequest) error
 	StopChannel(r requests.StopChannelRequest) error
 	ConnectChannel(r requests.ConnectChannelRequest) (webrtc.SessionDescription, error)
+	UploadLogo(r requests.UploadLogoRequest) error
 }
 
 func NewChannelService() ChannelService {
@@ -156,4 +157,8 @@ func (s *ChannelServiceImpl) ConnectChannel(r requests.ConnectChannelRequest) (w
 	}
 
 	return answer, nil
+}
+
+func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) error {
+	return s.db.ChangeLogo(r.ID, r.Logo)
 }

@@ -7,6 +7,7 @@ import (
 	"netradio/internal/model"
 	"netradio/internal/service"
 	"netradio/pkg/context"
+	"netradio/pkg/files"
 	"netradio/pkg/handlers"
 
 	"github.com/go-chi/chi/v5"
@@ -169,6 +170,32 @@ func HandleConnectChannel(ctx context.Context) (any, error) {
 	return res, nil
 }
 
+func HandleUploadLogo(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	path, err := files.Save(ctx.GetRequest())
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	var request requests.UploadLogoRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.Logo = path
+
+	err = service.NewChannelService().UploadLogo(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func RouteChannelPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -181,4 +208,5 @@ func RouteChannelPaths(
 	router.MethodFunc("POST", "/channel/{id}/start", handlers.MakeHandler(HandleStartChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/stop", handlers.MakeHandler(HandleStopChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/connect", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleConnectChannel), core))
+	router.MethodFunc("POST", "/channel/{id}/upload-logo", handlers.MakeHandler(HandleUploadLogo, core))
 }

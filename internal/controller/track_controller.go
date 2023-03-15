@@ -168,7 +168,7 @@ func HandleUploadTrack(ctx context.Context) (any, error) {
 		return nil, nil
 	}
 
-	path, err := files.Save(ctx.GetRequest(), ".ogg")
+	path, err := files.Save(ctx.GetRequest())
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err

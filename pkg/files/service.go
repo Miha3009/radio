@@ -11,13 +11,13 @@ import (
 
 var basePath = filepath.Join(".", "files")
 
-func Save(r *http.Request, ext string) (string, error) {
+func Save(r *http.Request) (string, error) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		return "", err
 	}
 
-	f, _, err := r.FormFile("file")
+	f, h, err := r.FormFile("file")
 	if err != nil {
 		return "", err
 	}
@@ -26,7 +26,7 @@ func Save(r *http.Request, ext string) (string, error) {
 
 	defer f.Close()
 	_ = os.MkdirAll(basePath, os.ModePerm)
-	fullPath := basePath + "/" + id.String() + ext
+	fullPath := basePath + "/" + id.String() + filepath.Ext(h.Filename)
 	file, err := os.OpenFile(fullPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return "", err

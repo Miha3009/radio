@@ -31,3 +31,8 @@ type ConnectChannelRequest struct {
 	ID  string
 	SDP string `json:"sdp"`
 }
+
+type UploadLogoRequest struct {
+	ID   string
+	Logo string
+}

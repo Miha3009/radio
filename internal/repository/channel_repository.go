@@ -15,6 +15,7 @@ type ChannelDB interface {
 	UpdateChannel(channel model.ChannelInfo) error
 	DeleteChannel(id string) error
 	ChangeChannelStatus(id string, status model.ChannelStatus) error
+	ChangeLogo(id, logo string) error
 }
 
 func NewChannelDB() ChannelDB {
@@ -90,5 +91,10 @@ func (db *ChannelDBImpl) DeleteChannel(id string) error {
 
 func (db *ChannelDBImpl) ChangeChannelStatus(id string, status model.ChannelStatus) error {
 	_, err := db.conn.Exec("UPDATE channels SET status=$1 WHERE id=$2", status, id)
+	return err
+}
+
+func (db *ChannelDBImpl) ChangeLogo(id, logo string) error {
+	_, err := db.conn.Exec("UPDATE channels SET logo=$1 WHERE id=$2", logo, id)
 	return err
 }

@@ -8,6 +8,7 @@ import (
 	"netradio/internal/model"
 	"netradio/internal/service"
 	"netradio/pkg/context"
+	"netradio/pkg/files"
 	"netradio/pkg/handlers"
 	"netradio/pkg/jwt"
 	"strconv"
@@ -219,6 +220,32 @@ func HandleResetPasswordChange(ctx context.Context) (any, error) {
 	return res, nil
 }
 
+func HandleUploadAvatar(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role == model.UserGuest {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	path, err := files.Save(ctx.GetRequest())
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	var request requests.UploadAvatarRequest
+	request.UserID = strconv.Itoa(user.ID)
+	request.Avatar = path
+
+	err = service.NewUserService().UploadAvatar(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func RouteUserPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -231,4 +258,5 @@ func RouteUserPaths(
 	router.MethodFunc("POST", "/reset-password/send-code", handlers.MakeHandler(HandleResetPasswordSendCode, core))
 	router.MethodFunc("GET", "/reset-password/verify-code", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleResetPasswordVerifyCode), core))
 	router.MethodFunc("POST", "/reset-password/change", handlers.MakeHandler(HandleResetPasswordChange, core))
+	router.MethodFunc("POST", "/upload-avatar", handlers.MakeHandler(HandleUploadAvatar, core))
 }

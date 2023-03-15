@@ -43,7 +43,6 @@ func main() {
 	jwt.SetConfig(cfg.Jwt)
 	email.SetConfig(cfg.Email)
 
-	musicDB := repository.NewMusicDB()
 	userDB := repository.NewUserDB()
 
 	router := chi.NewRouter()
@@ -60,7 +59,7 @@ func main() {
 	controller.RouteChannelPaths(core, router)
 	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
-	podcast.RoutePaths(core, router, musicDB)
+	podcast.RoutePaths(core, router)
 	webrtc.StartAllChannels()
 
 	server := &http.Server{}
