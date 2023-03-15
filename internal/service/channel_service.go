@@ -21,6 +21,7 @@ type ChannelService interface {
 	StopChannel(r requests.StopChannelRequest) error
 	ConnectChannel(r requests.ConnectChannelRequest) (webrtc.SessionDescription, error)
 	UploadLogo(r requests.UploadLogoRequest) error
+	AddTrack(r requests.AddTrackRequest) error
 }
 
 func NewChannelService() ChannelService {
@@ -161,4 +162,13 @@ func (s *ChannelServiceImpl) ConnectChannel(r requests.ConnectChannelRequest) (w
 
 func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) error {
 	return s.db.ChangeLogo(r.ID, r.Logo)
+}
+
+func (s *ChannelServiceImpl) AddTrack(r requests.AddTrackRequest) error {
+	track, err := repository.NewTrackDB().GetTrackById(r.TrackID)
+	if err != nil {
+		return err
+	}
+
+	return s.db.AddTrackToSchedule(r.ID, r.TrackID, r.StartDate, r.StartDate.Add(track.Duration))
 }

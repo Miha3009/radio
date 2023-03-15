@@ -14,6 +14,7 @@ require (
 require (
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/pion/datachannel v1.5.5 // indirect
 	github.com/pion/dtls/v2 v2.2.6 // indirect

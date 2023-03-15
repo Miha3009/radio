@@ -5,6 +5,7 @@ import (
 	"errors"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"time"
 )
 
 type ChannelDB interface {
@@ -14,6 +15,7 @@ type ChannelDB interface {
 	CreateChannel(channel model.ChannelInfo) error
 	UpdateChannel(channel model.ChannelInfo) error
 	DeleteChannel(id string) error
+	AddTrackToSchedule(id, trackid string, start, end time.Time) error
 	ChangeChannelStatus(id string, status model.ChannelStatus) error
 	ChangeLogo(id, logo string) error
 }
@@ -86,6 +88,11 @@ func (db *ChannelDBImpl) UpdateChannel(channel model.ChannelInfo) error {
 
 func (db *ChannelDBImpl) DeleteChannel(id string) error {
 	_, err := db.conn.Exec("DELETE FROM channels WHERE id=$1", id)
+	return err
+}
+
+func (db *ChannelDBImpl) AddTrackToSchedule(id, trackid string, start, end time.Time) error {
+	_, err := db.conn.Exec("INSERT INTO schedule (channelid, trackid, start, end)")
 	return err
 }
 

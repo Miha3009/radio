@@ -64,7 +64,7 @@ func (s *UserServiceImpl) Register(r requests.RegisterRequest) (responses.Regist
 	newUser.Name = r.Name
 	newUser.Email = r.Email
 	newUser.Password = hashedPassword
-	newUser.Role = model.UserRegistered
+	newUser.Role = model.UserAdministrator
 	err = s.db.CreateUser(newUser)
 	if err != nil {
 		return res, err

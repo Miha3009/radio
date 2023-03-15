@@ -41,8 +41,7 @@ CREATE TABLE tracks (
 	title VARCHAR(255),
 	perfomancer VARCHAR(255),
 	year INT,
-	audio VARCHAR(255),
-	duration BIGINT
+	audio VARCHAR(255)
 );
 
 CREATE TABLE tracks_likes (

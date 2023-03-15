@@ -1,5 +1,7 @@
 package requests
 
+import "time"
+
 type GetChannelRequest struct {
 	ID string
 }
@@ -35,4 +37,10 @@ type ConnectChannelRequest struct {
 type UploadLogoRequest struct {
 	ID   string
 	Logo string
+}
+
+type AddTrackRequest struct {
+	ID        string
+	TrackID   string    `json:"trackid"`
+	StartDate time.Time `json:"startdate"`
 }

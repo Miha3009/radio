@@ -196,6 +196,30 @@ func HandleUploadLogo(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
+func HandleAddTrack(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.AddTrackRequest
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+
+	err = service.NewChannelService().AddTrack(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func RouteChannelPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -209,4 +233,5 @@ func RouteChannelPaths(
 	router.MethodFunc("POST", "/channel/{id}/stop", handlers.MakeHandler(HandleStopChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/connect", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleConnectChannel), core))
 	router.MethodFunc("POST", "/channel/{id}/upload-logo", handlers.MakeHandler(HandleUploadLogo, core))
+	router.MethodFunc("POST", "/channel/{id}/add-track", handlers.MakeHandler(HandleAddTrack, core))
 }

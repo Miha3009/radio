@@ -1,12 +1,17 @@
 package service
 
 import (
+	"errors"
+	"io"
 	"netradio/internal/controller/requests"
 	"netradio/internal/controller/responses"
 	"netradio/internal/model"
 	"netradio/internal/repository"
+	"os"
 	"strconv"
 	"time"
+
+	"github.com/pion/webrtc/v3/pkg/media/oggreader"
 )
 
 type TrackService interface {
@@ -45,6 +50,7 @@ func (s *TrackServiceImpl) GetTrack(r requests.GetTrackRequest) (responses.GetTr
 	res.Title = track.Title
 	res.Perfomancer = track.Perfomancer
 	res.Year = track.Year
+	res.Duration = track.Duration
 
 	if r.UserID != nil {
 		liked, err := s.db.IsTrackLiked(r.ID, *r.UserID)
@@ -131,5 +137,32 @@ func (s *TrackServiceImpl) CommentTrack(r requests.CommentTrackRequest) error {
 }
 
 func (s *TrackServiceImpl) UploadTrack(r requests.UploadTrackRequest) error {
-	return s.db.ChangeTrackAudio(r.ID, r.Audio)
+	file, err := os.Open(r.Audio)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	ogg, _, err := oggreader.NewWith(file)
+	if err != nil {
+		return err
+	}
+
+	var lastGranule uint64
+	duration := time.Duration(0)
+
+	for {
+		_, pageHeader, err := ogg.ParseNextPage()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		sampleCount := float64(pageHeader.GranulePosition - lastGranule)
+		lastGranule = pageHeader.GranulePosition
+		duration = duration + time.Duration((sampleCount/48000)*1000)*time.Millisecond
+	}
+
+	return s.db.ChangeTrackAudio(r.ID, r.Audio, duration)
 }

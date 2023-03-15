@@ -28,7 +28,6 @@ type ContextImpl struct {
 func (c *ContextImpl) GetUser() model.User {
 	userID, err := jwt.GetUserIDFromHeader(c.request.Header)
 	if err != nil {
-		c.logger.Warn(err)
 		return makeDefaultUser()
 	}
 	user, err := repository.NewUserDB().GetUserById(strconv.Itoa(userID))

@@ -16,7 +16,7 @@ type TrackDB interface {
 	LikeTrack(id, userId string) error
 	UnlikeTrack(id, userId string) error
 	CommentTrack(id, commentId string) error
-	ChangeTrackAudio(id, audio string) error
+	ChangeTrackAudio(id, audio string, duration time.Duration) error
 }
 
 func NewTrackDB() TrackDB {
@@ -31,12 +31,12 @@ type TrackDBImpl struct {
 
 func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 	var res model.Track
-	rows, err := db.conn.Query("SELECT id, title, perfomancer, year FROM tracks WHERE id=$1", id)
+	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE id=$1", id)
 	if err != nil {
 		return &res, err
 	}
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Title, &res.Perfomancer, &res.Year)
+		err = rows.Scan(&res.ID, &res.Title, &res.Perfomancer, &res.Year, &res.Audio, &res.Duration)
 		return &res, err
 	}
 
@@ -81,7 +81,7 @@ func (db *TrackDBImpl) CommentTrack(id, commentId string) error {
 	return err
 }
 
-func (db *TrackDBImpl) ChangeTrackAudio(id, audio string) error {
-	_, err := db.conn.Exec("UPDATE tracks SET audio=$1 WHERE id=$2", audio, id)
+func (db *TrackDBImpl) ChangeTrackAudio(id, audio string, duration time.Duration) error {
+	_, err := db.conn.Exec("UPDATE tracks SET audio=$1, duration=$2 WHERE id=$3", audio, duration, id)
 	return err
 }
