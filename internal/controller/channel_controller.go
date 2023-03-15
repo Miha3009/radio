@@ -149,6 +149,26 @@ func HandleStopChannel(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
+func HandleConnectChannel(ctx context.Context) (any, error) {
+	var request requests.ConnectChannelRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+
+	res, err := service.NewChannelService().ConnectChannel(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusNotFound)
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func RouteChannelPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -160,4 +180,5 @@ func RouteChannelPaths(
 	router.MethodFunc("PATCH", "/channel/{id}", handlers.MakeHandler(HandleUpdateChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/start", handlers.MakeHandler(HandleStartChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/stop", handlers.MakeHandler(HandleStopChannel, core))
+	router.MethodFunc("POST", "/channel/{id}/connect", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleConnectChannel), core))
 }

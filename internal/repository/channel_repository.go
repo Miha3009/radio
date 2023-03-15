@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"netradio/internal/model"
 	"netradio/pkg/database"
 )
@@ -9,6 +10,7 @@ import (
 type ChannelDB interface {
 	GetChannels() ([]model.ChannelShortInfo, error)
 	GetChannelById(id string) (*model.ChannelInfo, error)
+	GetCurrentTrack(id string) (string, error)
 	CreateChannel(channel model.ChannelInfo) error
 	UpdateChannel(channel model.ChannelInfo) error
 	DeleteChannel(id string) error
@@ -57,6 +59,20 @@ func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {
 	return nil, nil
 }
 
+func (db *ChannelDBImpl) GetCurrentTrack(id string) (string, error) {
+	var res string
+	rows, err := db.conn.Query("SELECT audio FROM schedule JOIN tracks ON tracks.id=schedule.trackid WHERE channelid=$1 AND NOW() between startdate AND enddate LIMIT 1", id)
+	if err != nil {
+		return res, err
+	}
+	if rows.Next() {
+		err = rows.Scan(&res)
+		return res, err
+	}
+
+	return res, errors.New("Track not found")
+
+}
 func (db *ChannelDBImpl) CreateChannel(channel model.ChannelInfo) error {
 	_, err := db.conn.Exec("INSERT INTO channels (title, description, status) VALUES ($1, $2, $3)", channel.Title, channel.Description, channel.Status)
 	return err

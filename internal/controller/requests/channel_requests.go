@@ -26,3 +26,8 @@ type StartChannelRequest struct {
 type StopChannelRequest struct {
 	ID string
 }
+
+type ConnectChannelRequest struct {
+	ID  string
+	SDP string `json:"sdp"`
+}

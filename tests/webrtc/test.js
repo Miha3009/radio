@@ -29,7 +29,7 @@ pc.ontrack = function (event) {
 
 window.startSession = () => {
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "http://localhost:8080/podcast/0/start");
+  xhr.open("POST", "http://localhost:8080/channel/2/connect");
   xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
   console.log(localDescription);
   xhr.send(JSON.stringify({sdp: localDescription.sdp}));

@@ -5,78 +5,60 @@ import (
 	"fmt"
 	"io"
 	"netradio/internal/controller/requests"
-	"netradio/internal/model"
-	"netradio/internal/repository"
 	"netradio/pkg/context"
 
 	"github.com/pion/webrtc/v3"
 )
 
 func PodacstGetter(context context.Context) (any, error) {
-
-	audioTrack, _ := webrtc.NewTrackLocalStaticRTP(webrtc.RTPCodecCapability{
-		MimeType: webrtc.MimeTypeOpus,
-	}, "audio", "pion")
-
-	// load music
-	go func() {
-		musicChunks, err := repository.NewMusicDB().LoadMusicBatch(model.MusicInfo{})
+	/*
+		offer, err := readOffer(context.GetRequest().Body)
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		for batch := range musicChunks {
-			audioTrack.Write(batch) // пока попробуем писать без кодека, придумаем если что-то не пойдет
+		pc, err := webrtc.NewPeerConnection(webrtchelper.GetPeerConfig())
+		if err != nil {
+			return nil, err
 		}
-	}()
 
-	peerConnectionConfig := webrtc.Configuration{
-		ICEServers: []webrtc.ICEServer{
-			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
-			},
-		},
-	}
+		rtpSender, err := pc.AddTrack(webrtchelper.GetAudioTrack())
+		if err != nil {
+			panic(err)
+		}
 
-	// offer for webrtc
-	offer, err := readOffer(context.GetRequest().Body)
-	if err != nil {
-		return nil, err
-	}
+		go func() {
+			rtcpBuf := make([]byte, 1500)
+			for {
+				if _, _, rtcpErr := rtpSender.Read(rtcpBuf); rtcpErr != nil {
+					return
+				}
+			}
+		}()
 
-	pc, err := webrtc.NewPeerConnection(peerConnectionConfig)
-	if err != nil {
-		return nil, err
-	}
+		err = pc.SetRemoteDescription(*offer)
+		if err != nil {
+			return nil, err
+		}
 
-	_, err = pc.AddTrack(audioTrack)
-	if err != nil {
-		panic(err)
-	}
+		answer, err := pc.CreateAnswer(nil)
+		if err != nil {
+			return nil, err
+		}
 
-	err = pc.SetRemoteDescription(*offer)
-	if err != nil {
-		return nil, err
-	}
+		err = pc.SetLocalDescription(answer)
+		if err != nil {
+			return nil, err
+		}
 
-	answer, err := pc.CreateAnswer(nil)
-	if err != nil {
-		return nil, err
-	}
-
-	err = pc.SetLocalDescription(answer)
-	if err != nil {
-		return nil, err
-	}
-
-	ansJson, err := json.Marshal(answer)
-	if err != nil {
-		return nil, err
-	}
-	_, err = context.GetResponseWriter().Write(ansJson)
-	if err != nil {
-		return nil, err
-	}
+		ansJson, err := json.Marshal(answer)
+		if err != nil {
+			return nil, err
+		}
+		_, err = context.GetResponseWriter().Write(ansJson)
+		if err != nil {
+			return nil, err
+		}*/
 	return nil, nil
 }
 

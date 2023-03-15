@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"netradio/pkg/handlers"
 	"netradio/pkg/jwt"
+	"netradio/pkg/webrtc"
 	"os"
 	"os/signal"
 	"syscall"
@@ -60,6 +61,7 @@ func main() {
 	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
 	podcast.RoutePaths(core, router, musicDB)
+	webrtc.StartAllChannels()
 
 	server := &http.Server{}
 	server.Addr = fmt.Sprintf(":%d", cfg.Port)
