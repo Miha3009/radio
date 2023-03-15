@@ -6,10 +6,15 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
 var basePath = filepath.Join(".", "files")
+
+func StartFileServer(router chi.Router) {
+	router.Handle("/files/*", http.StripPrefix("/files/", http.FileServer(http.Dir(basePath))))
+}
 
 func Save(r *http.Request) (string, error) {
 	err := r.ParseMultipartForm(32 << 20)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"netradio/pkg/files"
 	"netradio/pkg/handlers"
 	"netradio/pkg/jwt"
 	"netradio/pkg/webrtc"
@@ -61,6 +62,7 @@ func main() {
 	controller.RouteNewsPaths(core, router)
 	podcast.RoutePaths(core, router)
 	webrtc.StartAllChannels()
+	files.StartFileServer(router)
 
 	server := &http.Server{}
 	server.Addr = fmt.Sprintf(":%d", cfg.Port)
