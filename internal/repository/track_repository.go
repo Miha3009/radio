@@ -16,6 +16,7 @@ type TrackDB interface {
 	LikeTrack(id, userId string) error
 	UnlikeTrack(id, userId string) error
 	CommentTrack(id, commentId string) error
+	ChangeTrackAudio(id, audio string) error
 }
 
 func NewTrackDB() TrackDB {
@@ -77,5 +78,10 @@ func (db *TrackDBImpl) UnlikeTrack(id, userId string) error {
 
 func (db *TrackDBImpl) CommentTrack(id, commentId string) error {
 	_, err := db.conn.Exec("INSERT INTO tracks_comments (trackid, commentid) VALUES ($1, $2)", id, commentId)
+	return err
+}
+
+func (db *TrackDBImpl) ChangeTrackAudio(id, audio string) error {
+	_, err := db.conn.Exec("UPDATE tracks SET audio=$1 WHERE id=$2", audio, id)
 	return err
 }

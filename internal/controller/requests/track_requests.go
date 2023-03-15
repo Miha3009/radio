@@ -34,3 +34,8 @@ type CommentTrackRequest struct {
 	Text   string  `json:"text"`
 	Parent *string `json:"parent,omitempty"`
 }
+
+type UploadTrackRequest struct {
+	ID    string
+	Audio string
+}

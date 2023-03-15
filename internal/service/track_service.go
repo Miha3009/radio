@@ -16,6 +16,7 @@ type TrackService interface {
 	UpdateTrack(r requests.UpdateTrackRequest) (responses.UpdateTrackResponse, error)
 	LikeTrack(r requests.LikeTrackRequest) error
 	CommentTrack(r requests.CommentTrackRequest) error
+	UploadTrack(r requests.UploadTrackRequest) error
 }
 
 func NewTrackService() TrackService {
@@ -127,4 +128,8 @@ func (s *TrackServiceImpl) CommentTrack(r requests.CommentTrackRequest) error {
 	}
 
 	return s.db.CommentTrack(r.ID, strconv.Itoa(commentId))
+}
+
+func (s *TrackServiceImpl) UploadTrack(r requests.UploadTrackRequest) error {
+	return s.db.ChangeTrackAudio(r.ID, r.Audio)
 }

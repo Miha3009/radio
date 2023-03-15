@@ -7,6 +7,7 @@ import (
 	"netradio/internal/model"
 	"netradio/internal/service"
 	"netradio/pkg/context"
+	"netradio/pkg/files"
 	"netradio/pkg/handlers"
 	"strconv"
 
@@ -160,6 +161,32 @@ func HandleCommentTrack(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
+func HandleUploadTrack(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	path, err := files.Save(ctx.GetRequest(), ".ogg")
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	var request requests.UploadTrackRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.Audio = path
+
+	err = service.NewTrackService().UploadTrack(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func RouteTrackPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -170,4 +197,5 @@ func RouteTrackPaths(
 	router.MethodFunc("PATCH", "/track/{id}", handlers.MakeHandler(HandleUpdateTrack, core))
 	router.MethodFunc("POST", "/track/{id}/like", handlers.MakeHandler(HandleLikeTrack, core))
 	router.MethodFunc("POST", "/track/{id}/comment", handlers.MakeHandler(HandleCommentTrack, core))
+	router.MethodFunc("POST", "/track/{id}/upload", handlers.MakeHandler(HandleUploadTrack, core))
 }

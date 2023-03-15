@@ -62,6 +62,7 @@ func StartChannel(channelID string) {
 			log.NewLogger().Error(err)
 			return
 		}
+		defer file.Close()
 
 		ogg, _, err := oggreader.NewWith(file)
 		if err != nil {
