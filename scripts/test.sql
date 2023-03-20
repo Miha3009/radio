@@ -1,88 +1,14 @@
-CREATE TABLE users (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(255),
-	email VARCHAR(255),
-	password VARCHAR(255),
-	avatar VARCHAR(255),
-	role INT
-);
+INSERT INTO users (name, email, password, role) VALUES 
+  ('Admin', 'admin@yandex.ru', '$2a$10$NN9YDCE77tR/BhahmtwoWOcpC9zjs3InRrtQamBzqBQvN0YgR3U3q', 2);
 
-CREATE TABLE sessions (
-	userid INT REFERENCES users(id) ON DELETE CASCADE,
-	ip VARCHAR(32),
-	refresh_token VARCHAR(255),
-	expires TIMESTAMP,
-	PRIMARY KEY (userid, ip)
-);
+INSERT INTO channels (id, title, description, status) VALUES 
+  (1, 'Channel 1', 'This is channel 1', 1),
+  (2, 'Channel 2', 'This is channel 2', 1);
 
-CREATE TABLE verification_codes (
-	email VARCHAR(255) PRIMARY KEY,
-	value VARCHAR(255),
-	expires TIMESTAMP
-);
+INSERT INTO tracks (id, title, perfomancer, year, audio) VALUES
+  (1, 'Track 1', 'Someone', 2019, 'files/1.ogg'),
+  (2, 'Track 2', 'Another', 2021, 'files/2.ogg');
 
-CREATE TABLE channels (
-	id SERIAL PRIMARY KEY,
-	title VARCHAR(255),
-	description TEXT,
-	status INT
-);
-
-CREATE TABLE comments (
-	id SERIAL PRIMARY KEY,
-	userid INT REFERENCES users(id) ON DELETE CASCADE,
-	parent INT REFERENCES comments(id) ON DELETE CASCADE,
-	text TEXT,
-	time TIMESTAMP
-);
-
-CREATE TABLE tracks (
-	id SERIAL PRIMARY KEY,
-	title VARCHAR(255),
-	perfomancer VARCHAR(255),
-	year INT,
-	audio VARCHAR(255)
-);
-
-CREATE TABLE tracks_likes (
-	userid INT REFERENCES users(id) ON DELETE CASCADE,
-	trackid INT REFERENCES tracks(id) ON DELETE CASCADE,
-	time TIMESTAMP,
-	PRIMARY KEY (userid, trackid)
-);
-
-CREATE TABLE tracks_comments (
-	trackid INT REFERENCES tracks(id) ON DELETE CASCADE,
-	commentid INT REFERENCES comments(id) ON DELETE CASCADE,
-	PRIMARY KEY (trackid, commentid)	
-);
-
-CREATE TABLE schedule (
-	channelid INT REFERENCES channels(id) ON DELETE CASCADE,
-	trackid INT REFERENCES tracks(id) ON DELETE CASCADE,
-	startdate TIMESTAMP,
-	enddate TIMESTAMP,
-	PRIMARY KEY (channelid, trackid, startdate)
-);
-
-CREATE TABLE news (
-	id SERIAL PRIMARY KEY,
-	title VARCHAR(255),
-	content TEXT,
-	publication_date TIMESTAMP
-);
-
-CREATE TABLE news_likes (
-	userid INT REFERENCES users(id) ON DELETE CASCADE,
-	newsid INT REFERENCES news(id) ON DELETE CASCADE,
-	time TIMESTAMP,
-	PRIMARY KEY (userid, newsid)
-);
-
-CREATE TABLE news_comments (
-	newsid INT REFERENCES news(id) ON DELETE CASCADE,
-	commentid INT REFERENCES comments(id) ON DELETE CASCADE,
-	PRIMARY KEY (newsid, commentid)	
-);
-
-
+INSERT INTO schedule (channelid, trackid, startdate, enddate) VALUES
+  (1, 1, NOW(), NOW() + interval '1' day),
+  (2, 2, NOW(), NOW() + interval '1' day);

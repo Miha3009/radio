@@ -50,12 +50,12 @@ func (db *ChannelDBImpl) GetChannels() ([]model.ChannelShortInfo, error) {
 
 func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {
 	var res model.ChannelInfo
-	rows, err := db.conn.Query("SELECT id, title, description, status FROM channels WHERE id=$1", id)
+	rows, err := db.conn.Query("SELECT id, title, description, logo, status FROM channels WHERE id=$1", id)
 	if err != nil {
 		return &res, err
 	}
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Title, &res.Description, &res.Status)
+		err = rows.Scan(&res.ID, &res.Title, &res.Description, &res.Logo, &res.Status)
 		return &res, err
 	}
 

@@ -4,6 +4,7 @@ type ChannelInfo struct {
 	ID          int           `json:"id"`
 	Title       string        `json:"title"`
 	Description string        `json:"description"`
+	Logo        string        `json:"logo"`
 	Status      ChannelStatus `json:"status"`
 }
 

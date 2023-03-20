@@ -25,6 +25,7 @@ CREATE TABLE channels (
 	id SERIAL PRIMARY KEY,
 	title VARCHAR(255),
 	description TEXT,
+	logo VARCHAR(255),
 	status INT
 );
 
