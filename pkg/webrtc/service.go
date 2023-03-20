@@ -24,7 +24,10 @@ func StartAllChannels() {
 	config = webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
+				URLs:           []string{"turn:relay.metered.ca:443"},
+				Username:       "a9067dff0bdee1097e961805",
+				Credential:     "btIRqKUbbhxsazf3",
+				CredentialType: webrtc.ICECredentialTypePassword,
 			},
 		},
 	}

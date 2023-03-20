@@ -1,7 +1,9 @@
 const pc = new RTCPeerConnection({
   iceServers: [
     {
-      urls: 'stun:stun.l.google.com:19302'
+      urls: "turn:relay.metered.ca:443",
+      username: 'a9067dff0bdee1097e961805',
+      credential: 'btIRqKUbbhxsazf3'
     }
   ]
 })
@@ -25,11 +27,13 @@ pc.ontrack = function (event) {
   el.srcObject = event.streams[0]
   el.autoplay = true
   el.controls = true
+  el.value = 1;
+  el.muted = false
 }
 
 window.startSession = () => {
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "http://localhost:8080/channel/2/connect");
+  xhr.open("POST", "http://51.250.73.253:8080/channel/2/connect");
   xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
   console.log(localDescription);
   xhr.send(JSON.stringify({sdp: localDescription.sdp}));
