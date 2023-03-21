@@ -5,10 +5,7 @@ import (
 	"netradio/internal/controller/responses"
 	"netradio/internal/model"
 	"netradio/internal/repository"
-	webrtchelper "netradio/pkg/webrtc"
 	"strconv"
-
-	"github.com/pion/webrtc/v3"
 )
 
 type ChannelService interface {
@@ -19,7 +16,6 @@ type ChannelService interface {
 	UpdateChannel(r requests.UpdateChannelRequest) (responses.UpdateChannelResponse, error)
 	StartChannel(r requests.StartChannelRequest) error
 	StopChannel(r requests.StopChannelRequest) error
-	ConnectChannel(r requests.ConnectChannelRequest) (webrtc.SessionDescription, error)
 	UploadLogo(r requests.UploadLogoRequest) error
 	AddTrack(r requests.AddTrackRequest) error
 }
@@ -111,53 +107,6 @@ func (s *ChannelServiceImpl) StartChannel(r requests.StartChannelRequest) error 
 
 func (s *ChannelServiceImpl) StopChannel(r requests.StopChannelRequest) error {
 	return s.db.ChangeChannelStatus(r.ID, model.StoppedChannel)
-}
-
-func (s *ChannelServiceImpl) ConnectChannel(r requests.ConnectChannelRequest) (webrtc.SessionDescription, error) {
-	var offer webrtc.SessionDescription
-	offer.SDP = r.SDP
-	offer.Type = webrtc.SDPTypeOffer
-
-	pc, err := webrtc.NewPeerConnection(webrtchelper.GetPeerConfig())
-	if err != nil {
-		return webrtc.SessionDescription{}, err
-	}
-
-	track, err := webrtchelper.GetAudioTrack(r.ID)
-	if err != nil {
-		return webrtc.SessionDescription{}, err
-	}
-
-	rtpSender, err := pc.AddTrack(track)
-	if err != nil {
-		return webrtc.SessionDescription{}, err
-	}
-
-	go func() {
-		rtcpBuf := make([]byte, 1500)
-		for {
-			if _, _, rtcpErr := rtpSender.Read(rtcpBuf); rtcpErr != nil {
-				return
-			}
-		}
-	}()
-
-	err = pc.SetRemoteDescription(offer)
-	if err != nil {
-		return webrtc.SessionDescription{}, err
-	}
-
-	answer, err := pc.CreateAnswer(nil)
-	if err != nil {
-		return webrtc.SessionDescription{}, err
-	}
-
-	err = pc.SetLocalDescription(answer)
-	if err != nil {
-		return webrtc.SessionDescription{}, err
-	}
-
-	return answer, nil
 }
 
 func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) error {

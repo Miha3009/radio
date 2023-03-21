@@ -13,6 +13,9 @@ require (
 
 require (
 	github.com/go-chi/cors v1.2.1 // indirect
+	github.com/gobwas/httphead v0.0.0-20180130184737-2c6c146eadee // indirect
+	github.com/gobwas/pool v0.2.0 // indirect
+	github.com/gobwas/ws v1.0.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
@@ -32,6 +35,7 @@ require (
 	github.com/pion/transport/v2 v2.0.2 // indirect
 	github.com/pion/turn/v2 v2.1.0 // indirect
 	github.com/pion/udp/v2 v2.0.1 // indirect
+	github.com/pkgz/websocket v1.2.10 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
