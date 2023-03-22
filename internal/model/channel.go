@@ -18,4 +18,5 @@ const (
 type ChannelShortInfo struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`
+	Logo  string `json:"logo"`
 }

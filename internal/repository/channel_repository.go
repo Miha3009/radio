@@ -32,15 +32,19 @@ type ChannelDBImpl struct {
 
 func (db *ChannelDBImpl) GetChannels() ([]model.ChannelShortInfo, error) {
 	res := make([]model.ChannelShortInfo, 0)
-	rows, err := db.conn.Query("SELECT id, title FROM channels WHERE status=$1", model.ActiveChannel)
+	rows, err := db.conn.Query("SELECT id, title, logo FROM channels WHERE status=$1", model.ActiveChannel)
 	if err != nil {
 		return res, err
 	}
 	for rows.Next() {
 		var temp model.ChannelShortInfo
-		err = rows.Scan(&temp.ID, &temp.Title)
+		var logo sql.NullString
+		err = rows.Scan(&temp.ID, &temp.Title, &logo)
 		if err != nil {
 			return res, err
+		}
+		if logo.Valid {
+			temp.Logo = logo.String
 		}
 		res = append(res, temp)
 	}
