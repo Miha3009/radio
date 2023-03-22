@@ -271,7 +271,10 @@ func HandleUploadAvatar(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	return nil, nil
+	var res responses.UpdateAvatarResponse
+	res.Avatar = path
+
+	return res, nil
 }
 
 func RouteUserPaths(
@@ -287,5 +290,5 @@ func RouteUserPaths(
 	router.MethodFunc("POST", "/reset-password/send-code", handlers.MakeHandler(HandleResetPasswordSendCode, core))
 	router.MethodFunc("GET", "/reset-password/verify-code", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleResetPasswordVerifyCode), core))
 	router.MethodFunc("POST", "/reset-password/change", handlers.MakeHandler(HandleResetPasswordChange, core))
-	router.MethodFunc("POST", "/upload-avatar", handlers.MakeHandler(HandleUploadAvatar, core))
+	router.MethodFunc("POST", "/upload-avatar", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleUploadAvatar), core))
 }

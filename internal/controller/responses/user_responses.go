@@ -35,3 +35,7 @@ type UserGetResponse struct {
 	Avatar string `json:"avatar"`
 	Role   int    `json:"role"`
 }
+
+type UpdateAvatarResponse struct {
+	Avatar string `json:"avatar"`
+}
