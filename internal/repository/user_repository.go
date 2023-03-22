@@ -36,6 +36,7 @@ type UserDBImpl struct {
 func (db *UserDBImpl) GetUserByEmail(email string) (*model.User, error) {
 	var res model.User
 	rows, err := db.conn.Query("SELECT id, email, password, name, avatar, role FROM users WHERE email=$1", email)
+	defer rows.Close()
 	if err != nil {
 		return &res, err
 	}
@@ -50,6 +51,7 @@ func (db *UserDBImpl) GetUserByEmail(email string) (*model.User, error) {
 func (db *UserDBImpl) GetUserById(id string) (*model.User, error) {
 	var res model.User
 	rows, err := db.conn.Query("SELECT id, email, password, name, avatar, role FROM users WHERE id=$1", id)
+	defer rows.Close()
 	if err != nil {
 		return &res, err
 	}
@@ -64,6 +66,7 @@ func (db *UserDBImpl) GetUserById(id string) (*model.User, error) {
 func (db *UserDBImpl) GetSessionsByRefreshToken(refreshToken string) ([]model.Session, error) {
 	res := make([]model.Session, 0)
 	rows, err := db.conn.Query("SELECT userid, refresh_token, expires, ip FROM sessions WHERE refresh_token=$1", refreshToken)
+	defer rows.Close()
 	if err != nil {
 		return res, err
 	}
@@ -82,6 +85,7 @@ func (db *UserDBImpl) GetSessionsByRefreshToken(refreshToken string) ([]model.Se
 func (db *UserDBImpl) GetVerificationCodeByEmail(email string) (*model.VerificationCode, error) {
 	var res model.VerificationCode
 	rows, err := db.conn.Query("SELECT email, value, expires FROM verification_codes WHERE email=$1", email)
+	defer rows.Close()
 	if err != nil {
 		return &res, err
 	}
@@ -99,12 +103,13 @@ func (db *UserDBImpl) CreateUser(user model.User) error {
 }
 
 func (db *UserDBImpl) CreateSession(userID int, refreshToken string, expires time.Time, ip string) error {
-	_, err := db.conn.Query("INSERT INTO sessions (userid, refresh_token, expires, ip) VALUES ($1, $2, $3, $4) ON CONFLICT (userid, ip) DO UPDATE SET refresh_token=EXCLUDED.refresh_token, expires=EXCLUDED.expires", userID, refreshToken, expires, ip)
+	_, err := db.conn.Exec("INSERT INTO sessions (userid, refresh_token, expires, ip) VALUES ($1, $2, $3, $4) ON CONFLICT (userid, ip) DO UPDATE SET refresh_token=EXCLUDED.refresh_token, expires=EXCLUDED.expires", userID, refreshToken, expires, ip)
 	return err
 }
 
 func (db *UserDBImpl) CreateVerificationCode(code model.VerificationCode) error {
-	_, err := db.conn.Query("INSERT INTO verification_codes (email, value, expires) VALUES ($1, $2, $3) ON CONFLICT (email) DO UPDATE SET value=EXCLUDED.value, expires=EXCLUDED.expires", code.Email, code.Value, code.Expires)
+	on, err := db.conn.Query("INSERT INTO verification_codes (email, value, expires) VALUES ($1, $2, $3) ON CONFLICT (email) DO UPDATE SET value=EXCLUDED.value, expires=EXCLUDED.expires", code.Email, code.Value, code.Expires)
+	defer on.Close()
 	return err
 }
 

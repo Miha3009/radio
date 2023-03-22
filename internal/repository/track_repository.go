@@ -41,6 +41,7 @@ func (db *TrackDBImpl) GetTracksCount() (int, error) {
 func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 	var res model.Track
 	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE id=$1", id)
+	defer rows.Close()
 	if err != nil {
 		return &res, err
 	}
@@ -56,6 +57,7 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 	res := make([]model.Track, 0)
 	query = "%" + query + "%"
 	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE title LIKE $3 OFFSET $1 LIMIT $2", offset, limit, query)
+	defer rows.Close()
 	if err != nil {
 		return res, err
 	}
@@ -96,6 +98,7 @@ func (db *TrackDBImpl) DeleteTrack(id string) error {
 
 func (db *TrackDBImpl) IsTrackLiked(id, userId string) (bool, error) {
 	rows, err := db.conn.Query("SELECT * FROM tracks_likes WHERE trackid=$1 AND userid=$2", id, userId)
+	defer rows.Close()
 	if err != nil {
 		return false, err
 	}

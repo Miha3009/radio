@@ -4,10 +4,10 @@ jwt:
   secret_key: "secret_key"
 
 database:
-  host: "postgres"
+  host: "localhost"
   port: 5432
   dbname: "radio"
-  user: "admin"
+  user: "miha3009"
   password: "password"
 
 email:
