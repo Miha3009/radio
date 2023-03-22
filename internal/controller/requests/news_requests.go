@@ -1,8 +1,9 @@
 package requests
 
 type GetNewsListRequest struct {
-	Offset int `json:"offset"`
-	Limit  int `json:"limit"`
+	Offset int
+	Limit  int
+	Query  string
 }
 
 type GetNewsRequest struct {

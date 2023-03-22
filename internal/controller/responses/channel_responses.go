@@ -1,6 +1,9 @@
 package responses
 
-import "netradio/internal/model"
+import (
+	"netradio/internal/model"
+	"time"
+)
 
 type GetChannelsResponse struct {
 	Channels []model.ChannelShortInfo `json:"channels"`
@@ -17,4 +20,14 @@ type GetChannelResponse struct {
 
 type UpdateChannelResponse struct {
 	Found bool `json:"-"`
+}
+
+type GetCurrentTrackResponse struct {
+	ID          string        `json:"id"`
+	Title       string        `json:"title"`
+	Perfomancer string        `json:"perfomancer"`
+	Year        int           `json:"year"`
+	Duration    time.Duration `json:"duration"`
+	Liked       bool          `json:"liked"`
+	CurrentTime time.Duration `json:"currentTime"`
 }

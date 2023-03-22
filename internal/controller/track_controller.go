@@ -37,6 +37,37 @@ func HandleGetTrack(ctx context.Context) (any, error) {
 	return res, nil
 }
 
+func HandleGetTrackList(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.GetTrackListRequest
+	offset, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("offset"))
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+	request.Offset = offset
+	limit, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("limit"))
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+	request.Limit = limit
+	request.Query = ctx.GetRequest().URL.Query().Get("query")
+
+	res, err := service.NewTrackService().GetTrackList(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func HandleCreateTrack(ctx context.Context) (any, error) {
 	user := ctx.GetUser()
 	if user.Role != model.UserAdministrator {
@@ -191,6 +222,7 @@ func RouteTrackPaths(
 	core handlers.Core,
 	router chi.Router,
 ) {
+	router.MethodFunc("GET", "/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetTrackList), core))
 	router.MethodFunc("GET", "/track/{id}", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetTrack), core))
 	router.MethodFunc("PUT", "/track", handlers.MakeHandler(HandleCreateTrack, core))
 	router.MethodFunc("DELETE", "/track/{id}", handlers.MakeHandler(HandleDeleteTrack, core))

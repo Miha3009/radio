@@ -9,6 +9,7 @@ import (
 
 type TrackDB interface {
 	GetTrackById(id string) (*model.Track, error)
+	GetTrackList(offset, limit int, query string) ([]model.Track, error)
 	CreateTrack(track model.Track) error
 	UpdateTrack(track model.Track) error
 	DeleteTrack(id string) error
@@ -41,6 +42,33 @@ func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 	}
 
 	return nil, nil
+}
+
+func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Track, error) {
+	res := make([]model.Track, 0)
+	query = "%" + query + "%"
+	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE title LIKE $3 OFFSET $1 LIMIT $2", offset, limit, query)
+	if err != nil {
+		return res, err
+	}
+	for rows.Next() {
+		var temp model.Track
+		var audio sql.NullString
+		var duration sql.NullInt64
+		err = rows.Scan(&temp.ID, &temp.Title, &temp.Perfomancer, &temp.Year, &audio, &duration)
+		if err != nil {
+			return res, err
+		}
+		if audio.Valid {
+			temp.Audio = audio.String
+		}
+		if duration.Valid {
+			temp.Duration = time.Duration(duration.Int64)
+		}
+		res = append(res, temp)
+	}
+
+	return res, nil
 }
 
 func (db *TrackDBImpl) CreateTrack(track model.Track) error {

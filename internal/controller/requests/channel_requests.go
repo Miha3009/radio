@@ -44,3 +44,8 @@ type AddTrackRequest struct {
 	TrackID   string    `json:"trackid"`
 	StartDate time.Time `json:"startdate"`
 }
+
+type GetCurrentTrackRequest struct {
+	ID     string
+	UserID *string
+}

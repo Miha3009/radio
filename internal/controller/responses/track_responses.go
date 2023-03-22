@@ -1,6 +1,9 @@
 package responses
 
-import "time"
+import (
+	"netradio/internal/model"
+	"time"
+)
 
 type GetTrackResponse struct {
 	ID          string        `json:"id"`
@@ -10,6 +13,10 @@ type GetTrackResponse struct {
 	Duration    time.Duration `json:"duration"`
 	Liked       bool          `json:"liked"`
 	Found       bool          `json:"-"`
+}
+
+type GetTrackListResponse struct {
+	Tracks []model.Track `json:"tracks"`
 }
 
 type UpdateTrackResponse struct {

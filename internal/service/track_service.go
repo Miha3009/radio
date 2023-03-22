@@ -16,6 +16,7 @@ import (
 
 type TrackService interface {
 	GetTrack(r requests.GetTrackRequest) (responses.GetTrackResponse, error)
+	GetTrackList(r requests.GetTrackListRequest) (responses.GetTrackListResponse, error)
 	CreateTrack(r requests.CreateTrackRequest) error
 	DeleteTrack(r requests.DeleteTrackRequest) error
 	UpdateTrack(r requests.UpdateTrackRequest) (responses.UpdateTrackResponse, error)
@@ -61,6 +62,17 @@ func (s *TrackServiceImpl) GetTrack(r requests.GetTrackRequest) (responses.GetTr
 	} else {
 		res.Liked = false
 	}
+
+	return res, nil
+}
+
+func (s *TrackServiceImpl) GetTrackList(r requests.GetTrackListRequest) (responses.GetTrackListResponse, error) {
+	var res responses.GetTrackListResponse
+	tracks, err := s.db.GetTrackList(r.Offset, r.Limit, r.Query)
+	if err != nil {
+		return res, err
+	}
+	res.Tracks = tracks
 
 	return res, nil
 }

@@ -12,6 +12,7 @@ import (
 	"netradio/pkg/handlers"
 	"netradio/pkg/log"
 	webrtchelper "netradio/pkg/webrtc"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -206,6 +207,25 @@ func HandleAddTrack(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
+func HandleGetCurrentTrack(ctx context.Context) (any, error) {
+	var request requests.GetCurrentTrackRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	user := ctx.GetUser()
+	if user.Role != model.UserGuest {
+		userId := strconv.Itoa(user.ID)
+		request.UserID = &userId
+	}
+
+	res, err := service.NewChannelService().GetCurrentTrack(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil
+}
+
 type ConnectStruct struct {
 	ID string
 }
@@ -334,6 +354,7 @@ func RouteChannelPaths(
 	router.MethodFunc("POST", "/channel/{id}/stop", handlers.MakeHandler(HandleStopChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/upload-logo", handlers.MakeHandler(HandleUploadLogo, core))
 	router.MethodFunc("POST", "/channel/{id}/add-track", handlers.MakeHandler(HandleAddTrack, core))
+	router.MethodFunc("GET", "/channel/{id}/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetCurrentTrack), core))
 
 	router.HandleFunc("/channel/{id}/connect",
 		func(w http.ResponseWriter, req *http.Request) {

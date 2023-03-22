@@ -16,8 +16,9 @@ import (
 const oggPageDuration = time.Millisecond * 20
 
 var (
-	channelsToTracks map[string]*webrtc.TrackLocalStaticSample
-	config           webrtc.Configuration
+	channelsToTracks    map[string]*webrtc.TrackLocalStaticSample
+	channelsToTrackTime map[string]*time.Duration
+	config              webrtc.Configuration
 )
 
 func StartAllChannels() {
@@ -33,6 +34,7 @@ func StartAllChannels() {
 	}
 
 	channelsToTracks = make(map[string]*webrtc.TrackLocalStaticSample)
+	channelsToTrackTime = make(map[string]*time.Duration)
 
 	channels, err := repository.NewChannelDB().GetChannels()
 	if err != nil {
@@ -51,19 +53,27 @@ func StartChannel(channelID string) {
 		return
 	}
 
+	currentTime := time.Second
 	channelsToTracks[channelID] = audioTrack
+	channelsToTrackTime[channelID] = &currentTime
 
 	for {
-		path, err := repository.NewChannelDB().GetCurrentTrack(channelID)
+		track, err := repository.NewChannelDB().GetCurrentTrack(channelID)
 		if err != nil {
 			log.NewLogger().Error(err)
-			return
+			time.Sleep(time.Second)
+			continue
+		}
+		if track == nil {
+			time.Sleep(time.Second)
+			continue
 		}
 
-		file, err := os.Open(path)
+		file, err := os.Open(track.Audio)
 		if err != nil {
 			log.NewLogger().Error(err)
-			return
+			time.Sleep(time.Second)
+			continue
 		}
 		defer file.Close()
 
@@ -88,6 +98,7 @@ func StartChannel(channelID string) {
 			sampleCount := float64(pageHeader.GranulePosition - lastGranule)
 			lastGranule = pageHeader.GranulePosition
 			sampleDuration := time.Duration((sampleCount/48000)*1000) * time.Millisecond
+			currentTime = time.Duration((float64(pageHeader.GranulePosition)/48000)*1000) * time.Millisecond
 
 			if err = audioTrack.WriteSample(media.Sample{Data: pageData, Duration: sampleDuration}); err != nil {
 				log.NewLogger().Error(err)
@@ -107,4 +118,8 @@ func GetAudioTrack(channelID string) (*webrtc.TrackLocalStaticSample, error) {
 	} else {
 		return nil, errors.New("Track not found")
 	}
+}
+
+func GetCurrentTrackTime(channelID string) time.Duration {
+	return *channelsToTrackTime[channelID]
 }

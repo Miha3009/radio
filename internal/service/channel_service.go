@@ -1,10 +1,12 @@
 package service
 
 import (
+	"errors"
 	"netradio/internal/controller/requests"
 	"netradio/internal/controller/responses"
 	"netradio/internal/model"
 	"netradio/internal/repository"
+	webrtchelper "netradio/pkg/webrtc"
 	"strconv"
 )
 
@@ -18,6 +20,7 @@ type ChannelService interface {
 	StopChannel(r requests.StopChannelRequest) error
 	UploadLogo(r requests.UploadLogoRequest) error
 	AddTrack(r requests.AddTrackRequest) error
+	GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error)
 }
 
 func NewChannelService() ChannelService {
@@ -121,4 +124,33 @@ func (s *ChannelServiceImpl) AddTrack(r requests.AddTrackRequest) error {
 	}
 
 	return s.db.AddTrackToSchedule(r.ID, r.TrackID, r.StartDate, r.StartDate.Add(track.Duration))
+}
+
+func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error) {
+	var res responses.GetCurrentTrackResponse
+	track, err := s.db.GetCurrentTrack(r.ID)
+	if err != nil {
+		return res, err
+	}
+	if track == nil {
+		return res, errors.New("Track not found")
+	}
+
+	res.ID = strconv.Itoa(track.ID)
+	res.Title = track.Title
+	res.Perfomancer = track.Perfomancer
+	res.Year = track.Year
+	res.Duration = track.Duration
+	res.CurrentTime = webrtchelper.GetCurrentTrackTime(r.ID)
+	if r.UserID != nil {
+		liked, err := repository.NewTrackDB().IsTrackLiked(r.ID, *r.UserID)
+		if err != nil {
+			return res, err
+		}
+		res.Liked = liked
+	} else {
+		res.Liked = false
+	}
+
+	return res, nil
 }

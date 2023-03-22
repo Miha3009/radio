@@ -8,18 +8,26 @@ import (
 	"netradio/internal/service"
 	"netradio/pkg/context"
 	"netradio/pkg/handlers"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func HandleGetNewsList(ctx context.Context) (any, error) {
 	var request requests.GetNewsListRequest
-	decoder := json.NewDecoder(ctx.GetRequest().Body)
-	err := decoder.Decode(&request)
+	offset, err := strconv.Atoi(chi.URLParam(ctx.GetRequest(), "offset"))
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
 		return nil, err
 	}
+	request.Offset = offset
+	limit, err := strconv.Atoi(chi.URLParam(ctx.GetRequest(), "limit"))
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+	request.Limit = limit
+	request.Query = ctx.GetRequest().URL.Query().Get("query")
 
 	res, err := service.NewNewsService().GetNewsList(request)
 	if err != nil {

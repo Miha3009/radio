@@ -5,6 +5,12 @@ type GetTrackRequest struct {
 	UserID *string
 }
 
+type GetTrackListRequest struct {
+	Offset int
+	Limit  int
+	Query  string
+}
+
 type CreateTrackRequest struct {
 	Title       string `json:"title"`
 	Perfomancer string `json:"description"`

@@ -8,7 +8,7 @@ import (
 
 type NewsDB interface {
 	GetNewsCount() (int, error)
-	GetNewsList(offset, limit int) ([]model.NewsShortInfo, error)
+	GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, error)
 	GetNewsById(id string) (*model.News, error)
 	CreateNews(news model.News) error
 	UpdateNews(news model.News) error
@@ -31,9 +31,10 @@ func (db *NewsDBImpl) GetNewsCount() (int, error) {
 	return count, err
 }
 
-func (db *NewsDBImpl) GetNewsList(offset, limit int) ([]model.NewsShortInfo, error) {
+func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, error) {
 	res := make([]model.NewsShortInfo, 0)
-	rows, err := db.conn.Query("SELECT id, title, publication_date FROM news ORDER BY publication_date OFFSET $1 LIMIT $2", offset, limit)
+	query = "%" + query + "%"
+	rows, err := db.conn.Query("SELECT id, title, publication_date FROM news WHERE title LIKE $3 ORDER BY publication_date OFFSET $1 LIMIT $2", offset, limit, query)
 	if err != nil {
 		return res, err
 	}
