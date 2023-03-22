@@ -18,6 +18,7 @@ type TrackDB interface {
 	UnlikeTrack(id, userId string) error
 	CommentTrack(id, commentId string) error
 	ChangeTrackAudio(id, audio string, duration time.Duration) error
+	LikeCount(id string) (int, error)
 }
 
 func NewTrackDB() TrackDB {
@@ -112,4 +113,10 @@ func (db *TrackDBImpl) CommentTrack(id, commentId string) error {
 func (db *TrackDBImpl) ChangeTrackAudio(id, audio string, duration time.Duration) error {
 	_, err := db.conn.Exec("UPDATE tracks SET audio=$1, duration=$2 WHERE id=$3", audio, duration, id)
 	return err
+}
+
+func (db *TrackDBImpl) LikeCount(id string) (int, error) {
+	var count int
+	err := db.conn.QueryRow("SELECT COUNT(*) FROM tracks JOIN tracks_likes ON tracks.id=tracks_likes.trackid").Scan(&count)
+	return count, err
 }

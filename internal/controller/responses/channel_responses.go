@@ -29,5 +29,6 @@ type GetCurrentTrackResponse struct {
 	Year        int           `json:"year"`
 	Duration    time.Duration `json:"duration"`
 	Liked       bool          `json:"liked"`
+	LikeCount   int           `json:"likeCount"`
 	CurrentTime time.Duration `json:"currentTime"`
 }

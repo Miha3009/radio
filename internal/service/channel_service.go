@@ -142,6 +142,11 @@ func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) 
 	res.Year = track.Year
 	res.Duration = track.Duration
 	res.CurrentTime = webrtchelper.GetCurrentTrackTime(r.ID)
+	likeCount, err := repository.NewTrackDB().LikeCount(res.ID)
+	if err != nil {
+		return res, err
+	}
+	res.LikeCount = likeCount
 	if r.UserID != nil {
 		liked, err := repository.NewTrackDB().IsTrackLiked(r.ID, *r.UserID)
 		if err != nil {
