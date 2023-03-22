@@ -59,8 +59,16 @@ func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {
 		return &res, err
 	}
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Title, &res.Description, &res.Logo, &res.Status)
-		return &res, err
+		var logo sql.NullString
+		err = rows.Scan(&res.ID, &res.Title, &res.Description, &logo, &res.Status)
+		if err != nil {
+			return nil, err
+		}
+		if logo.Valid {
+			res.Logo = logo.String
+		}
+
+		return &res, nil
 	}
 
 	return nil, nil

@@ -58,6 +58,7 @@ func (s *ChannelServiceImpl) GetChannel(r requests.GetChannelRequest) (responses
 	res.Title = channel.Title
 	res.Description = channel.Description
 	res.Status = int(channel.Status)
+	res.Logo = channel.Logo
 
 	return res, nil
 }
