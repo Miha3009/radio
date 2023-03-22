@@ -164,6 +164,19 @@ func HandleLikeTrack(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
+func HandleGetTrackComments(ctx context.Context) (any, error) {
+	var request requests.GetTrackCommentsRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	res, err := service.NewTrackService().GetTrackComments(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil	
+}
+
 func HandleCommentTrack(ctx context.Context) (any, error) {
 	user := ctx.GetUser()
 	if user.Role == model.UserGuest {
@@ -226,6 +239,7 @@ func RouteTrackPaths(
 	router.MethodFunc("DELETE", "/track/{id}", handlers.MakeHandler(HandleDeleteTrack, core))
 	router.MethodFunc("PATCH", "/track/{id}", handlers.MakeHandler(HandleUpdateTrack, core))
 	router.MethodFunc("POST", "/track/{id}/like", handlers.MakeHandler(HandleLikeTrack, core))
+	router.MethodFunc("GET", "/track/{id}/comment", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetTrackComments), core))
 	router.MethodFunc("POST", "/track/{id}/comment", handlers.MakeHandler(HandleCommentTrack, core))
 	router.MethodFunc("POST", "/track/{id}/upload", handlers.MakeHandler(HandleUploadTrack, core))
 }

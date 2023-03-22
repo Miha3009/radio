@@ -17,6 +17,7 @@ type TrackDB interface {
 	IsTrackLiked(id, userId string) (bool, error)
 	LikeTrack(id, userId string) error
 	UnlikeTrack(id, userId string) error
+	GetTrackComments(id string) ([]model.Comment, error)
 	CommentTrack(id, commentId string) error
 	ChangeTrackAudio(id, audio string, duration time.Duration) error
 	LikeCount(id string) (int, error)
@@ -113,6 +114,31 @@ func (db *TrackDBImpl) LikeTrack(id, userId string) error {
 func (db *TrackDBImpl) UnlikeTrack(id, userId string) error {
 	_, err := db.conn.Exec("DELETE FROM tracks_likes WHERE trackid=$1 AND userid=$2", id, userId)
 	return err
+}
+
+func (db *TrackDBImpl) GetTrackComments(id string) ([]model.Comment, error) {
+	res := make([]model.Comment, 0)
+	rows, err := db.conn.Query("SELECT comments.id, comments.userid, comments.parent, comments.text, comments.time FROM tracks_comments JOIN comments ON tracks_comments.commentid=comments.id WHERE tracks_comments.trackid=$1", id)
+	defer rows.Close()
+	if err != nil {
+		return res, err
+	}
+	for rows.Next() {
+		var temp model.Comment
+		var parent sql.NullInt32
+		err = rows.Scan(&temp.ID, &temp.UserID, &parent, &temp.Text, &temp.Date)
+		if err != nil {
+			return res, err
+		}
+		if parent.Valid {
+			temp.Parent = int(parent.Int32)
+		} else {
+			temp.Parent = -1
+		}
+		res = append(res, temp)
+	}
+
+	return res, nil
 }
 
 func (db *TrackDBImpl) CommentTrack(id, commentId string) error {

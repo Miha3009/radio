@@ -21,6 +21,7 @@ type TrackService interface {
 	DeleteTrack(r requests.DeleteTrackRequest) error
 	UpdateTrack(r requests.UpdateTrackRequest) (responses.UpdateTrackResponse, error)
 	LikeTrack(r requests.LikeTrackRequest) error
+	GetTrackComments(r requests.GetTrackCommentsRequest) (responses.GetTrackCommentsResponse, error)
 	CommentTrack(r requests.CommentTrackRequest) error
 	UploadTrack(r requests.UploadTrackRequest) error
 }
@@ -133,6 +134,33 @@ func (s *TrackServiceImpl) LikeTrack(r requests.LikeTrackRequest) error {
 	}
 }
 
+func (s *TrackServiceImpl) GetTrackComments(r requests.GetTrackCommentsRequest) (responses.GetTrackCommentsResponse, error) {
+	var res responses.GetTrackCommentsResponse
+	comments, err := s.db.GetTrackComments(r.ID)
+	if err != nil {
+		return res, err
+	}
+	commentMap := make(map[int]*model.Comment)
+	for i := range comments {
+		comments[i].Children = make([]model.Comment, 0)
+		commentMap[comments[i].ID] = &comments[i]
+	}
+	for i := range comments {
+		if comments[i].Parent != -1 {
+			commentMap[comments[i].Parent].Children = append(commentMap[comments[i].Parent].Children, comments[i])
+		}
+	}
+	newComments := make([]model.Comment, 0)
+	for i := range comments {
+		if comments[i].Parent == -1 {
+			newComments = append(newComments, comments[i])
+		}
+	}
+	res.Comments = newComments
+
+	return res, nil
+}
+
 func (s *TrackServiceImpl) CommentTrack(r requests.CommentTrackRequest) error {
 	var comment model.Comment
 	comment.UserID = r.UserID
@@ -143,7 +171,7 @@ func (s *TrackServiceImpl) CommentTrack(r requests.CommentTrackRequest) error {
 		if err != nil {
 			return err
 		}
-		comment.Parent = &parent
+		comment.Parent = parent
 	}
 
 	commentId, err := repository.NewCommentDB().CreateComment(comment)

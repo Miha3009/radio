@@ -23,3 +23,7 @@ type GetTrackListResponse struct {
 type UpdateTrackResponse struct {
 	Found bool `json:"-"`
 }
+
+type GetTrackCommentsResponse struct {
+	Comments []model.Comment `json:"comments"`
+}

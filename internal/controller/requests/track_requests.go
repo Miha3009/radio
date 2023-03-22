@@ -34,6 +34,10 @@ type LikeTrackRequest struct {
 	Like   bool `json:"like"`
 }
 
+type GetTrackCommentsRequest struct {
+	ID     string
+}
+
 type CommentTrackRequest struct {
 	ID     string
 	UserID int
@@ -45,3 +49,4 @@ type UploadTrackRequest struct {
 	ID    string
 	Audio string
 }
+

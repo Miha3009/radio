@@ -117,7 +117,29 @@ INSERT INTO schedule (channelid, trackid, startdate, enddate) VALUES
   (5, 5, NOW(), NOW() + interval '1' day);
 
 INSERT INTO news (id, title, content, publication_date) VALUES
-(1, 'Новость 1', '# Заголовок', NOW()),
-(2, 'Новость 2', '# Заголовок', NOW()),
-(3, 'Новость 3', '# Заголовок', NOW()),
-(4, 'Новость 4', '# Заголовок', NOW());
+  (1, 'Новость 1', '# Заголовок', NOW() - interval '1' hour),
+  (2, 'Новость 2', '# Заголовок', NOW() - interval '3' hour),
+  (3, 'Новость 3', '# Заголовок', NOW() - interval '7' hour),
+  (4, 'Новость 4', '# Заголовок', NOW() - interval '10' hour);
+
+INSERT INTO comments (id, userid, parent, text, time) VALUES
+  (1, 1, NULL, 'Я первый', NOW() - interval '20' minute),
+  (2, 2, NULL, 'Кто это вообще слушает?', NOW() - interval '5' minute),
+  (3, 3, NULL, 'Лайк не глядя', NOW() - interval '3' minute),
+  (4, 4, NULL, 'Жаль подписки не добавили', NOW() - interval '8' minute),
+  (5, 5, NULL, 'Ура! Комментарии работают!', NOW() - interval '12' minute),
+  (6, 2, 1, 'Боже чел', NOW());
+
+INSERT INTO tracks_comments (trackid, commentid) VALUES
+  (1, 1), (1, 6), (1, 2), (1, 3), (1, 4),
+  (2, 1), (2, 6), (2, 2), (2, 3), (2, 5), 
+  (3, 1), (3, 6), (3, 2), (3, 4), (3, 5), 
+  (4, 1), (4, 6), (4, 3), (4, 4), (4, 5), 
+  (5, 2), (5, 3), (5, 4), (5, 5);
+
+INSERT INTO news_comments (newsid, commentid) VALUES
+  (1, 2), (1, 3), (1, 4), (1, 5), 
+  (2, 1), (2, 6), (2, 3), (2, 4), (2, 5), 
+  (3, 1), (3, 6), (3, 2), (3, 4), (3, 5), 
+  (4, 1), (4, 6), (4, 2), (4, 3), (4, 5);
+
