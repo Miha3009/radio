@@ -74,6 +74,12 @@ func (s *TrackServiceImpl) GetTrackList(r requests.GetTrackListRequest) (respons
 	}
 	res.Tracks = tracks
 
+	tracksCount, err := s.db.GetTracksCount()
+	if err != nil {
+		return res, err
+	}
+	res.Count = tracksCount
+
 	return res, nil
 }
 

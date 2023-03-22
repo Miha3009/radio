@@ -47,14 +47,12 @@ func HandleGetTrackList(ctx context.Context) (any, error) {
 	var request requests.GetTrackListRequest
 	offset, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("offset"))
 	if err != nil {
-		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
-		return nil, err
+		offset = 0
 	}
 	request.Offset = offset
 	limit, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("limit"))
 	if err != nil {
-		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
-		return nil, err
+		limit = 1000000
 	}
 	request.Limit = limit
 	request.Query = ctx.GetRequest().URL.Query().Get("query")

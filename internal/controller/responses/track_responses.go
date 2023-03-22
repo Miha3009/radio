@@ -17,6 +17,7 @@ type GetTrackResponse struct {
 
 type GetTrackListResponse struct {
 	Tracks []model.Track `json:"tracks"`
+	Count  int           `json:"count"`
 }
 
 type UpdateTrackResponse struct {

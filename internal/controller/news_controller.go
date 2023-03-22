@@ -15,16 +15,14 @@ import (
 
 func HandleGetNewsList(ctx context.Context) (any, error) {
 	var request requests.GetNewsListRequest
-	offset, err := strconv.Atoi(chi.URLParam(ctx.GetRequest(), "offset"))
+	offset, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("offset"))
 	if err != nil {
-		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
-		return nil, err
+		offset = 0
 	}
 	request.Offset = offset
-	limit, err := strconv.Atoi(chi.URLParam(ctx.GetRequest(), "limit"))
+	limit, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("limit"))
 	if err != nil {
-		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
-		return nil, err
+		limit = 1000000
 	}
 	request.Limit = limit
 	request.Query = ctx.GetRequest().URL.Query().Get("query")

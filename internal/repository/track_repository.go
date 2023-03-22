@@ -8,6 +8,7 @@ import (
 )
 
 type TrackDB interface {
+	GetTracksCount() (int, error)
 	GetTrackById(id string) (*model.Track, error)
 	GetTrackList(offset, limit int, query string) ([]model.Track, error)
 	CreateTrack(track model.Track) error
@@ -29,6 +30,12 @@ func NewTrackDB() TrackDB {
 
 type TrackDBImpl struct {
 	conn *sql.DB
+}
+
+func (db *TrackDBImpl) GetTracksCount() (int, error) {
+	count := 0
+	err := db.conn.QueryRow("SELECT COUNT(*) FROM tracks").Scan(&count)
+	return count, err
 }
 
 func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
