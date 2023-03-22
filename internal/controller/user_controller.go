@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"netradio/internal/controller/requests"
+	"netradio/internal/controller/responses"
 	"netradio/internal/model"
 	"netradio/internal/service"
 	"netradio/pkg/context"
@@ -128,6 +129,25 @@ func HandleLogout(ctx context.Context) (any, error) {
 	http.SetCookie(ctx.GetResponseWriter(), &http.Cookie{Name: "refreshToken", Value: "", Expires: time.Unix(0, 0)})
 
 	return nil, nil
+}
+
+func HandleUserGet(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role == model.UserGuest {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var res responses.UserGetResponse
+	res.ID = user.ID
+	res.Name = user.Name
+	res.Email = user.Email
+	res.Role = int(user.Role)
+	if user.Avatar.Valid {
+		res.Avatar = user.Avatar.String
+	}
+
+	return res, nil
 }
 
 func HandleUserDelete(ctx context.Context) (any, error) {
@@ -254,6 +274,7 @@ func RouteUserPaths(
 	router.MethodFunc("POST", "/login", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleLogin), core))
 	router.MethodFunc("GET", "/refresh", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleRefresh), core))
 	router.MethodFunc("POST", "/logout", handlers.MakeHandler(HandleLogout, core))
+	router.MethodFunc("GET", "/user", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleUserGet), core))
 	router.MethodFunc("DELETE", "/user", handlers.MakeHandler(HandleUserDelete, core))
 	router.MethodFunc("POST", "/reset-password/send-code", handlers.MakeHandler(HandleResetPasswordSendCode, core))
 	router.MethodFunc("GET", "/reset-password/verify-code", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleResetPasswordVerifyCode), core))
