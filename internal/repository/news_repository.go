@@ -40,7 +40,7 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 	}
 	for rows.Next() {
 		var temp model.NewsShortInfo
-		err = rows.Scan(&temp.ID, &temp.Title)
+		err = rows.Scan(&temp.ID, &temp.Title, &temp.PublicationDate)
 		if err != nil {
 			return res, err
 		}

@@ -124,6 +124,6 @@ func (db *TrackDBImpl) ChangeTrackAudio(id, audio string, duration time.Duration
 
 func (db *TrackDBImpl) LikeCount(id string) (int, error) {
 	var count int
-	err := db.conn.QueryRow("SELECT COUNT(*) FROM tracks JOIN tracks_likes ON tracks.id=tracks_likes.trackid").Scan(&count)
+	err := db.conn.QueryRow("SELECT COUNT(*) FROM tracks_likes WHERE trackid=$1", id).Scan(&count)
 	return count, err
 }
