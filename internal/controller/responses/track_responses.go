@@ -27,3 +27,7 @@ type UpdateTrackResponse struct {
 type GetTrackCommentsResponse struct {
 	Comments []model.Comment `json:"comments"`
 }
+
+type CommentTrackResponse struct {
+	ID int `json:"id"`
+}

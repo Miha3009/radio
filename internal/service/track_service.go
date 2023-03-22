@@ -22,7 +22,7 @@ type TrackService interface {
 	UpdateTrack(r requests.UpdateTrackRequest) (responses.UpdateTrackResponse, error)
 	LikeTrack(r requests.LikeTrackRequest) error
 	GetTrackComments(r requests.GetTrackCommentsRequest) (responses.GetTrackCommentsResponse, error)
-	CommentTrack(r requests.CommentTrackRequest) error
+	CommentTrack(r requests.CommentTrackRequest) (responses.CommentTrackResponse, error)
 	UploadTrack(r requests.UploadTrackRequest) error
 }
 
@@ -161,7 +161,8 @@ func (s *TrackServiceImpl) GetTrackComments(r requests.GetTrackCommentsRequest) 
 	return res, nil
 }
 
-func (s *TrackServiceImpl) CommentTrack(r requests.CommentTrackRequest) error {
+func (s *TrackServiceImpl) CommentTrack(r requests.CommentTrackRequest) (responses.CommentTrackResponse, error) {
+	var res responses.CommentTrackResponse
 	var comment model.Comment
 	comment.UserID = r.UserID
 	comment.Text = r.Text
@@ -169,17 +170,18 @@ func (s *TrackServiceImpl) CommentTrack(r requests.CommentTrackRequest) error {
 	if r.Parent != nil {
 		parent, err := strconv.Atoi(*r.Parent)
 		if err != nil {
-			return err
+			return res, err
 		}
 		comment.Parent = parent
 	}
 
 	commentId, err := repository.NewCommentDB().CreateComment(comment)
 	if err != nil {
-		return err
+		return res, err
 	}
+	res.ID = commentId
 
-	return s.db.CommentTrack(r.ID, strconv.Itoa(commentId))
+	return res, s.db.CommentTrack(r.ID, strconv.Itoa(commentId))
 }
 
 func (s *TrackServiceImpl) UploadTrack(r requests.UploadTrackRequest) error {

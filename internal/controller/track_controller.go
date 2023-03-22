@@ -194,13 +194,13 @@ func HandleCommentTrack(ctx context.Context) (any, error) {
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
 	request.UserID = user.ID
 
-	err = service.NewTrackService().CommentTrack(request)
+	res, err := service.NewTrackService().CommentTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 
-	return nil, nil
+	return res, nil
 }
 
 func HandleUploadTrack(ctx context.Context) (any, error) {
@@ -240,6 +240,6 @@ func RouteTrackPaths(
 	router.MethodFunc("PATCH", "/track/{id}", handlers.MakeHandler(HandleUpdateTrack, core))
 	router.MethodFunc("POST", "/track/{id}/like", handlers.MakeHandler(HandleLikeTrack, core))
 	router.MethodFunc("GET", "/track/{id}/comment", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetTrackComments), core))
-	router.MethodFunc("POST", "/track/{id}/comment", handlers.MakeHandler(HandleCommentTrack, core))
+	router.MethodFunc("POST", "/track/{id}/comment", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleCommentTrack), core))
 	router.MethodFunc("POST", "/track/{id}/upload", handlers.MakeHandler(HandleUploadTrack, core))
 }

@@ -22,6 +22,10 @@ type CommentDBImpl struct {
 
 func (db *CommentDBImpl) CreateComment(comment model.Comment) (int, error) {
 	id := 0
-	err := db.conn.QueryRow("INSERT INTO comments (userid, parent, text, time) VALUES ($1, $2, $3, $4) RETURNING id", comment.UserID, comment.Parent, comment.Text, comment.Date).Scan(&id)
+	parent := &comment.Parent
+	if comment.Parent <= 0 {
+		parent = nil
+	}
+	err := db.conn.QueryRow("INSERT INTO comments (userid, parent, text, time) VALUES ($1, $2, $3, NOW()) RETURNING id", comment.UserID, parent, comment.Text).Scan(&id)
 	return id, err
 }
