@@ -52,7 +52,7 @@ func AddRefreshTokenToCookie(w http.ResponseWriter, r *http.Request, userID int)
 	expires := time.Now().Add(RefreshTokenTTL)
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
 	repository.NewUserDB().CreateSession(userID, refreshToken, expires, ip)
-	http.SetCookie(w, &http.Cookie{Name: "refreshToken", Value: refreshToken, Expires: expires})
+	http.SetCookie(w, &http.Cookie{Name: "refreshToken", Value: refreshToken, Expires: expires, Path: "/", SameSite: http.SameSiteNoneMode, HttpOnly: true, Secure: true})
 }
 
 func GetUserIDFromHeader(header http.Header) (int, error) {

@@ -1,9 +1,9 @@
 INSERT INTO users (name, email, password, role, avatar) VALUES 
   ('Admin', 'admin@yandex.ru', '$2a$10$NN9YDCE77tR/BhahmtwoWOcpC9zjs3InRrtQamBzqBQvN0YgR3U3q', 2, NULL),
-  ('User 1', 'user1@yandex.ru', '$2a$10$H3RLgGWd6I872d1JTPiEXOyuL3x6SyfdvMoAEPQaGCupbZPuvJs6a', 1, 'files/avatar-1'),
-  ('User 2', 'user2@yandex.ru', '$2a$10$DQnNxoRFOV2PEfKTMj5Y0uOSKwaLDu4PShMnIoVRTgnRlI.EJJ87y', 1, 'files/avatar-2'),
-  ('User 3', 'user3@yandex.ru', '$2a$10$2hXFbpNkU4Zc7Q4hOUf/7Oa0IsKyaonQA.baVa24yt9DV3rUk.Um6', 1, 'files/avatar-3'),
-  ('User 4', 'user4@yandex.ru', '$2a$10$V4iRIco2MBZzmlbSbrZzwuahAq3uTr9MG556jwzk2yDhDD0c4WicG', 1, 'files/avatar-4'),
+  ('User 1', 'user1@yandex.ru', '$2a$10$H3RLgGWd6I872d1JTPiEXOyuL3x6SyfdvMoAEPQaGCupbZPuvJs6a', 1, 'files/avatar-1.jpg'),
+  ('User 2', 'user2@yandex.ru', '$2a$10$DQnNxoRFOV2PEfKTMj5Y0uOSKwaLDu4PShMnIoVRTgnRlI.EJJ87y', 1, 'files/avatar-2.jpg'),
+  ('User 3', 'user3@yandex.ru', '$2a$10$2hXFbpNkU4Zc7Q4hOUf/7Oa0IsKyaonQA.baVa24yt9DV3rUk.Um6', 1, 'files/avatar-3.jpg'),
+  ('User 4', 'user4@yandex.ru', '$2a$10$V4iRIco2MBZzmlbSbrZzwuahAq3uTr9MG556jwzk2yDhDD0c4WicG', 1, 'files/avatar-4.jpg'),
   ('User 5', 'user5@yandex.ru', '$2a$10$kbjg4vTm6WBU73iR9T7KNeXdKps9OcxBqx21Z9kLkE3D4HLsdS6xu', 1, NULL);
 
 INSERT INTO channels (id, title, status, logo, description) VALUES 
