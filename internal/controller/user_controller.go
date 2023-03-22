@@ -40,6 +40,8 @@ func HandleRegister(ctx context.Context) (any, error) {
 		}
 		res.AccessToken = accessToken
 		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
+	} else {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
 	}
 
 	return res, nil
@@ -67,6 +69,8 @@ func HandleLogin(ctx context.Context) (any, error) {
 		}
 		res.AccessToken = accessToken
 		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
+	} else {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
 	}
 
 	return res, nil
@@ -106,6 +110,8 @@ func HandleRefresh(ctx context.Context) (any, error) {
 		}
 		res.AccessToken = accessToken
 		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
+	} else {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
 	}
 
 	return res, nil
@@ -210,6 +216,8 @@ func HandleResetPasswordVerifyCode(ctx context.Context) (any, error) {
 		}
 		res.AccessToken = accessToken
 		jwt.AddRefreshTokenToCookie(ctx.GetResponseWriter(), ctx.GetRequest(), res.UserID)
+	} else {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
 	}
 
 	return res, nil
