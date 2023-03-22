@@ -42,10 +42,10 @@ func (db *TrackDBImpl) GetTracksCount() (int, error) {
 func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 	var res model.Track
 	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE id=$1", id)
-	defer rows.Close()
 	if err != nil {
 		return &res, err
 	}
+	defer rows.Close()
 	if rows.Next() {
 		err = rows.Scan(&res.ID, &res.Title, &res.Perfomancer, &res.Year, &res.Audio, &res.Duration)
 		return &res, err
@@ -58,10 +58,10 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 	res := make([]model.Track, 0)
 	query = "%" + query + "%"
 	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE title LIKE $3 OFFSET $1 LIMIT $2", offset, limit, query)
-	defer rows.Close()
 	if err != nil {
 		return res, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var temp model.Track
 		var audio sql.NullString
@@ -99,10 +99,10 @@ func (db *TrackDBImpl) DeleteTrack(id string) error {
 
 func (db *TrackDBImpl) IsTrackLiked(id, userId string) (bool, error) {
 	rows, err := db.conn.Query("SELECT * FROM tracks_likes WHERE trackid=$1 AND userid=$2", id, userId)
-	defer rows.Close()
 	if err != nil {
 		return false, err
 	}
+	defer rows.Close()
 	return rows.Next(), nil
 }
 
@@ -118,17 +118,21 @@ func (db *TrackDBImpl) UnlikeTrack(id, userId string) error {
 
 func (db *TrackDBImpl) GetTrackComments(id string) ([]model.Comment, error) {
 	res := make([]model.Comment, 0)
-	rows, err := db.conn.Query("SELECT comments.id, comments.userid, comments.parent, comments.text, comments.time FROM tracks_comments JOIN comments ON tracks_comments.commentid=comments.id WHERE tracks_comments.trackid=$1", id)
-	defer rows.Close()
+	rows, err := db.conn.Query("SELECT comments.id, users.id, users.name, users.avatar, comments.parent, comments.text, comments.time FROM tracks_comments JOIN comments ON tracks_comments.commentid=comments.id JOIN users ON comments.userid=users.id WHERE tracks_comments.trackid=$1", id)
 	if err != nil {
 		return res, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var temp model.Comment
 		var parent sql.NullInt32
-		err = rows.Scan(&temp.ID, &temp.UserID, &parent, &temp.Text, &temp.Date)
+		var avatar sql.NullString
+		err = rows.Scan(&temp.ID, &temp.UserID, &temp.UserName, &avatar, &parent, &temp.Text, &temp.Date)
 		if err != nil {
 			return res, err
+		}
+		if avatar.Valid {
+			temp.UserAvatar = avatar.String
 		}
 		if parent.Valid {
 			temp.Parent = int(parent.Int32)

@@ -131,7 +131,7 @@ INSERT INTO comments (id, userid, parent, text, time) VALUES
   (6, 2, 1, 'Боже чел', NOW());
 
 INSERT INTO tracks_comments (trackid, commentid) VALUES
-  (1, 1), (1, 6), (1, 2), (1, 3), (1, 4),
+  (1, 1), (1, 6), (1, 2), (1, 3), (1, 4), (1, 5),
   (2, 1), (2, 6), (2, 2), (2, 3), (2, 5), 
   (3, 1), (3, 6), (3, 2), (3, 4), (3, 5), 
   (4, 1), (4, 6), (4, 3), (4, 4), (4, 5), 

@@ -35,10 +35,10 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 	res := make([]model.NewsShortInfo, 0)
 	query = "%" + query + "%"
 	rows, err := db.conn.Query("SELECT id, title, publication_date FROM news WHERE title LIKE $3 ORDER BY publication_date OFFSET $1 LIMIT $2", offset, limit, query)
-	defer rows.Close()
 	if err != nil {
 		return res, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var temp model.NewsShortInfo
 		err = rows.Scan(&temp.ID, &temp.Title, &temp.PublicationDate)
@@ -54,10 +54,10 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 func (db *NewsDBImpl) GetNewsById(id string) (*model.News, error) {
 	var res model.News
 	rows, err := db.conn.Query("SELECT id, title, content, pubication_date FROM news WHERE id=$1", id)
-	defer rows.Close()
 	if err != nil {
 		return &res, err
 	}
+	defer rows.Close()
 	if rows.Next() {
 		err = rows.Scan(&res.ID, &res.Title, &res.Content, &res.PublicationDate)
 		return &res, err

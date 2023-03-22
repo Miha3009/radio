@@ -32,10 +32,10 @@ type ChannelDBImpl struct {
 func (db *ChannelDBImpl) GetChannels() ([]model.ChannelShortInfo, error) {
 	res := make([]model.ChannelShortInfo, 0)
 	rows, err := db.conn.Query("SELECT id, title, logo FROM channels WHERE status=$1", model.ActiveChannel)
-	defer rows.Close()
 	if err != nil {
 		return res, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var temp model.ChannelShortInfo
 		var logo sql.NullString
@@ -55,10 +55,10 @@ func (db *ChannelDBImpl) GetChannels() ([]model.ChannelShortInfo, error) {
 func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {
 	var res model.ChannelInfo
 	rows, err := db.conn.Query("SELECT id, title, description, logo, status FROM channels WHERE id=$1", id)
-	defer rows.Close()
 	if err != nil {
 		return &res, err
 	}
+	defer rows.Close()
 	if rows.Next() {
 		var logo sql.NullString
 		err = rows.Scan(&res.ID, &res.Title, &res.Description, &logo, &res.Status)
@@ -78,10 +78,10 @@ func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {
 func (db *ChannelDBImpl) GetCurrentTrack(id string) (*model.Track, error) {
 	var res model.Track
 	rows, err := db.conn.Query("SELECT tracks.id, tracks.title, tracks.perfomancer, tracks.year, tracks.audio, tracks.duration FROM schedule JOIN tracks ON tracks.id=schedule.trackid WHERE channelid=$1 AND NOW() between startdate AND enddate LIMIT 1", id)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	if rows.Next() {
 		var audio sql.NullString
 		var duration sql.NullInt64
