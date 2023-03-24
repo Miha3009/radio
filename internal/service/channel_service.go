@@ -138,7 +138,7 @@ func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) 
 
 	res.ID = strconv.Itoa(track.ID)
 	res.Title = track.Title
-	res.Perfomancer = track.Perfomancer
+	res.Performancer = track.Performancer
 	res.Year = track.Year
 	res.Duration = track.Duration
 	res.CurrentTime = webrtchelper.GetCurrentTrackTime(r.ID)

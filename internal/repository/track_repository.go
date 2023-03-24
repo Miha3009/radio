@@ -41,13 +41,13 @@ func (db *TrackDBImpl) GetTracksCount() (int, error) {
 
 func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 	var res model.Track
-	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE id=$1", id)
+	rows, err := db.conn.Query("SELECT id, title, performancer, year, audio, duration FROM tracks WHERE id=$1", id)
 	if err != nil {
 		return &res, err
 	}
 	defer rows.Close()
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Title, &res.Perfomancer, &res.Year, &res.Audio, &res.Duration)
+		err = rows.Scan(&res.ID, &res.Title, &res.Performancer, &res.Year, &res.Audio, &res.Duration)
 		return &res, err
 	}
 
@@ -57,7 +57,7 @@ func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Track, error) {
 	res := make([]model.Track, 0)
 	query = "%" + query + "%"
-	rows, err := db.conn.Query("SELECT id, title, perfomancer, year, audio, duration FROM tracks WHERE title LIKE $3 OFFSET $1 LIMIT $2", offset, limit, query)
+	rows, err := db.conn.Query("SELECT id, title, performancer, year, audio, duration FROM tracks WHERE title LIKE $3 OFFSET $1 LIMIT $2", offset, limit, query)
 	if err != nil {
 		return res, err
 	}
@@ -66,7 +66,7 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 		var temp model.Track
 		var audio sql.NullString
 		var duration sql.NullInt64
-		err = rows.Scan(&temp.ID, &temp.Title, &temp.Perfomancer, &temp.Year, &audio, &duration)
+		err = rows.Scan(&temp.ID, &temp.Title, &temp.Performancer, &temp.Year, &audio, &duration)
 		if err != nil {
 			return res, err
 		}
@@ -84,12 +84,12 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 
 func (db *TrackDBImpl) CreateTrack(track model.Track) (int, error) {
 	var id int
-	err := db.conn.QueryRow("INSERT INTO tracks (title, perfomancer, year) VALUES ($1, $2, $3) RETURNING id", track.Title, track.Perfomancer, track.Year).Scan(&id)
+	err := db.conn.QueryRow("INSERT INTO tracks (title, performancer, year) VALUES ($1, $2, $3) RETURNING id", track.Title, track.Performancer, track.Year).Scan(&id)
 	return id, err
 }
 
 func (db *TrackDBImpl) UpdateTrack(track model.Track) error {
-	_, err := db.conn.Exec("UPDATE tracks SET title=$1, perfomancer=$2, year=$3 WHERE id=$4", track.Title, track.Perfomancer, track.Year, track.ID)
+	_, err := db.conn.Exec("UPDATE tracks SET title=$1, performancer=$2, year=$3 WHERE id=$4", track.Title, track.Performancer, track.Year, track.ID)
 	return err
 }
 

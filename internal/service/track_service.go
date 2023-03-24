@@ -50,7 +50,7 @@ func (s *TrackServiceImpl) GetTrack(r requests.GetTrackRequest) (responses.GetTr
 	res.Found = true
 	res.ID = strconv.Itoa(track.ID)
 	res.Title = track.Title
-	res.Perfomancer = track.Perfomancer
+	res.Performancer = track.Performancer
 	res.Year = track.Year
 	res.Duration = track.Duration
 
@@ -88,7 +88,7 @@ func (s *TrackServiceImpl) CreateTrack(r requests.CreateTrackRequest) (responses
 	var res responses.CreateTrackResponse
 	var track model.Track
 	track.Title = r.Title
-	track.Perfomancer = r.Perfomancer
+	track.Performancer = r.Performancer
 	track.Year = r.Year
 
 	id, err := s.db.CreateTrack(track)
@@ -119,8 +119,8 @@ func (s *TrackServiceImpl) UpdateTrack(r requests.UpdateTrackRequest) (responses
 	if r.Title != nil {
 		track.Title = *r.Title
 	}
-	if r.Perfomancer != nil {
-		track.Perfomancer = *r.Perfomancer
+	if r.Performancer != nil {
+		track.Performancer = *r.Performancer
 	}
 	if r.Year != nil {
 		track.Year = *r.Year

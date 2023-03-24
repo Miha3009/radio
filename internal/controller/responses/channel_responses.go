@@ -23,12 +23,12 @@ type UpdateChannelResponse struct {
 }
 
 type GetCurrentTrackResponse struct {
-	ID          string        `json:"id"`
-	Title       string        `json:"title"`
-	Perfomancer string        `json:"perfomancer"`
-	Year        int           `json:"year"`
-	Duration    time.Duration `json:"duration"`
-	Liked       bool          `json:"liked"`
-	LikeCount   int           `json:"likeCount"`
-	CurrentTime time.Duration `json:"currentTime"`
+	ID           string        `json:"id"`
+	Title        string        `json:"title"`
+	Performancer string        `json:"performancer"`
+	Year         int           `json:"year"`
+	Duration     time.Duration `json:"duration"`
+	Liked        bool          `json:"liked"`
+	LikeCount    int           `json:"likeCount"`
+	CurrentTime  time.Duration `json:"currentTime"`
 }

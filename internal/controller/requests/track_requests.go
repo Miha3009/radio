@@ -13,14 +13,14 @@ type GetTrackListRequest struct {
 
 type CreateTrackRequest struct {
 	Title       string `json:"title"`
-	Perfomancer string `json:"description"`
+	Performancer string `json:"performancer"`
 	Year        int    `json:"year"`
 }
 
 type UpdateTrackRequest struct {
 	ID          string
 	Title       *string `json:"title,omitempty"`
-	Perfomancer *string `json:"description,omitempty"`
+	Performancer *string `json:"performancer,omitempty"`
 	Year        *int    `json:"year,omitempty"`
 }
 
