@@ -2,8 +2,10 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"strings"
 	"time"
 )
 
@@ -37,7 +39,29 @@ func (db *ScheduleDBImpl) DeleteTrack(id string) error {
 }
 
 func (db *ScheduleDBImpl) UpdateTracks(tracks []model.ScheduleTrack) error {
-	return nil
+	tx, err := db.conn.Begin()
+
+	valueStrings := []string{}
+	valueArgs := []interface{}{}
+	for i, track := range tracks {
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d::integer, $%d::integer, $%d::integer, $%d::timestamp, $%d::timestamp)", i*5+1, i*5+2, i*5+3, i*5+4, i*5+5))
+		valueArgs = append(valueArgs, track.ID)
+		valueArgs = append(valueArgs, track.ChannelId)
+		valueArgs = append(valueArgs, track.TrackId)
+		valueArgs = append(valueArgs, track.StartDate)
+		valueArgs = append(valueArgs, track.EndDate)
+	}
+
+	stmt := fmt.Sprintf("UPDATE schedule AS s1 SET channelid=s2.channelid, trackid=s2.trackid, startdate=s2.startdate, enddate=s2.enddate FROM (VALUES %s) as s2(id, channelid, trackid, startdate, enddate) WHERE s1.id=s2.id", strings.Join(valueStrings, ","))
+	_, err = tx.Exec(stmt, valueArgs...)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+
+	return err
 }
 
 func (db *ScheduleDBImpl) GetPastTracks(id string, count int) ([]model.ScheduleTrackFull, error) {

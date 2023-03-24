@@ -24,11 +24,11 @@ type ChannelShortInfo struct {
 }
 
 type ScheduleTrack struct {
-	ID        string     `json:"id"`
-	TrackId   *string    `json:"trackid"`
-	ChannelId *string    `json:"channelid"`
-	StartDate *time.Time `json:"startdate"`
-	EndDate   *time.Time `json:"enddate"`
+	ID        string    `json:"id"`
+	TrackId   string    `json:"trackid"`
+	ChannelId string    `json:"channelid"`
+	StartDate time.Time `json:"startdate"`
+	EndDate   time.Time `json:"enddate"`
 }
 
 type ScheduleTrackFull struct {

@@ -38,8 +38,7 @@ func HandleUpdateTracksFromSchedule(ctx context.Context) (any, error) {
 		return nil, nil
 	}
 
-	var request requests.UpdateNewsRequest
-	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	var request requests.UpdateTracksFromScheduleRequest
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
 	err := decoder.Decode(&request)
 	if err != nil {
@@ -47,14 +46,10 @@ func HandleUpdateTracksFromSchedule(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	res, err := service.NewNewsService().UpdateNews(request)
+	err = service.NewScheduleService().UpdateTracks(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
-	}
-	if !res.Found {
-		ctx.GetResponseWriter().WriteHeader(http.StatusNotFound)
-		return res, nil
 	}
 
 	return nil, nil
@@ -65,5 +60,5 @@ func RouteSchedulePaths(
 	router chi.Router,
 ) {
 	router.MethodFunc("DELETE", "/schedule/{id}", handlers.MakeHandler(HandleDeleteTrackFromSchedule, core))
-	router.MethodFunc("PATCH", "/schedule", handlers.MakeHandler(HandleUpdateTracksFromSchedule, core))
+	router.MethodFunc("PUT", "/schedule", handlers.MakeHandler(HandleUpdateTracksFromSchedule, core))
 }

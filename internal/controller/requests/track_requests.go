@@ -12,16 +12,16 @@ type GetTrackListRequest struct {
 }
 
 type CreateTrackRequest struct {
-	Title       string `json:"title"`
+	Title        string `json:"title"`
 	Performancer string `json:"performancer"`
-	Year        int    `json:"year"`
+	Year         int    `json:"year"`
 }
 
 type UpdateTrackRequest struct {
-	ID          string
-	Title       *string `json:"title,omitempty"`
+	ID           string
+	Title        *string `json:"title,omitempty"`
 	Performancer *string `json:"performancer,omitempty"`
-	Year        *int    `json:"year,omitempty"`
+	Year         *int    `json:"year,omitempty"`
 }
 
 type DeleteTrackRequest struct {
@@ -35,7 +35,7 @@ type LikeTrackRequest struct {
 }
 
 type GetTrackCommentsRequest struct {
-	ID     string
+	ID string
 }
 
 type CommentTrackRequest struct {
@@ -49,4 +49,3 @@ type UploadTrackRequest struct {
 	ID    string
 	Audio string
 }
-
