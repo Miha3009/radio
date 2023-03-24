@@ -17,7 +17,7 @@ import (
 type TrackService interface {
 	GetTrack(r requests.GetTrackRequest) (responses.GetTrackResponse, error)
 	GetTrackList(r requests.GetTrackListRequest) (responses.GetTrackListResponse, error)
-	CreateTrack(r requests.CreateTrackRequest) error
+	CreateTrack(r requests.CreateTrackRequest) (responses.CreateTrackResponse, error)
 	DeleteTrack(r requests.DeleteTrackRequest) error
 	UpdateTrack(r requests.UpdateTrackRequest) (responses.UpdateTrackResponse, error)
 	LikeTrack(r requests.LikeTrackRequest) error
@@ -84,12 +84,20 @@ func (s *TrackServiceImpl) GetTrackList(r requests.GetTrackListRequest) (respons
 	return res, nil
 }
 
-func (s *TrackServiceImpl) CreateTrack(r requests.CreateTrackRequest) error {
+func (s *TrackServiceImpl) CreateTrack(r requests.CreateTrackRequest) (responses.CreateTrackResponse, error) {
+	var res responses.CreateTrackResponse
 	var track model.Track
 	track.Title = r.Title
 	track.Perfomancer = r.Perfomancer
 	track.Year = r.Year
-	return s.db.CreateTrack(track)
+
+	id, err := s.db.CreateTrack(track)
+	if err != nil {
+		return res, err
+	}
+	res.ID = strconv.Itoa(id)
+
+	return res, nil
 }
 
 func (s *TrackServiceImpl) DeleteTrack(r requests.DeleteTrackRequest) error {

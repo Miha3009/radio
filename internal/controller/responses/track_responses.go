@@ -20,6 +20,10 @@ type GetTrackListResponse struct {
 	Count  int           `json:"count"`
 }
 
+type CreateTrackResponse struct {
+	ID string `json:"id"`
+}
+
 type UpdateTrackResponse struct {
 	Found bool `json:"-"`
 }

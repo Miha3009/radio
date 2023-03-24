@@ -68,13 +68,13 @@ func HandleCreateNews(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	err = service.NewNewsService().CreateNews(request)
+	res, err := service.NewNewsService().CreateNews(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 
-	return nil, nil
+	return res, nil
 }
 
 func HandleDeleteNews(ctx context.Context) (any, error) {
@@ -131,7 +131,7 @@ func RouteNewsPaths(
 ) {
 	router.MethodFunc("GET", "/news", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetNewsList), core))
 	router.MethodFunc("GET", "/news/{id}", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetNews), core))
-	router.MethodFunc("PUT", "/news", handlers.MakeHandler(HandleCreateNews, core))
+	router.MethodFunc("PUT", "/news", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleCreateNews), core))
 	router.MethodFunc("DELETE", "/news/{id}", handlers.MakeHandler(HandleDeleteNews, core))
 	router.MethodFunc("PATCH", "/news/{id}", handlers.MakeHandler(HandleUpdateNews, core))
 }

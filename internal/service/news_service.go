@@ -12,7 +12,7 @@ import (
 type NewsService interface {
 	GetNewsList(r requests.GetNewsListRequest) (responses.GetNewsListResponse, error)
 	GetNews(r requests.GetNewsRequest) (responses.GetNewsResponse, error)
-	CreateNews(r requests.CreateNewsRequest) error
+	CreateNews(r requests.CreateNewsRequest) (responses.CreateNewsResponse, error)
 	DeleteNews(r requests.DeleteNewsRequest) error
 	UpdateNews(r requests.UpdateNewsRequest) (responses.UpdateNewsResponse, error)
 }
@@ -65,12 +65,20 @@ func (s *NewsServiceImpl) GetNews(r requests.GetNewsRequest) (responses.GetNewsR
 	return res, nil
 }
 
-func (s *NewsServiceImpl) CreateNews(r requests.CreateNewsRequest) error {
+func (s *NewsServiceImpl) CreateNews(r requests.CreateNewsRequest) (responses.CreateNewsResponse, error) {
+	var res responses.CreateNewsResponse
 	var news model.News
 	news.Title = r.Title
 	news.Content = r.Content
 	news.PublicationDate = time.Now()
-	return s.db.CreateNews(news)
+
+	id, err := s.db.CreateNews(news)
+	if err != nil {
+		return res, err
+	}
+	res.ID = strconv.Itoa(id)
+
+	return res, nil
 }
 
 func (s *NewsServiceImpl) DeleteNews(r requests.DeleteNewsRequest) error {

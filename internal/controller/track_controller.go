@@ -81,13 +81,13 @@ func HandleCreateTrack(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	err = service.NewTrackService().CreateTrack(request)
+	res, err := service.NewTrackService().CreateTrack(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 
-	return nil, nil
+	return res, nil
 }
 
 func HandleDeleteTrack(ctx context.Context) (any, error) {
@@ -174,7 +174,7 @@ func HandleGetTrackComments(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	return res, nil	
+	return res, nil
 }
 
 func HandleCommentTrack(ctx context.Context) (any, error) {
@@ -235,7 +235,7 @@ func RouteTrackPaths(
 ) {
 	router.MethodFunc("GET", "/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetTrackList), core))
 	router.MethodFunc("GET", "/track/{id}", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetTrack), core))
-	router.MethodFunc("PUT", "/track", handlers.MakeHandler(HandleCreateTrack, core))
+	router.MethodFunc("PUT", "/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleCreateTrack), core))
 	router.MethodFunc("DELETE", "/track/{id}", handlers.MakeHandler(HandleDeleteTrack, core))
 	router.MethodFunc("PATCH", "/track/{id}", handlers.MakeHandler(HandleUpdateTrack, core))
 	router.MethodFunc("POST", "/track/{id}/like", handlers.MakeHandler(HandleLikeTrack, core))

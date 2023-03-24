@@ -10,7 +10,7 @@ type NewsDB interface {
 	GetNewsCount() (int, error)
 	GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, error)
 	GetNewsById(id string) (*model.News, error)
-	CreateNews(news model.News) error
+	CreateNews(news model.News) (int, error)
 	UpdateNews(news model.News) error
 	DeleteNews(id string) error
 }
@@ -66,9 +66,10 @@ func (db *NewsDBImpl) GetNewsById(id string) (*model.News, error) {
 	return nil, nil
 }
 
-func (db *NewsDBImpl) CreateNews(news model.News) error {
-	_, err := db.conn.Exec("INSERT INTO news (title, content, publication_date)  VALUES ($1, $2, $3)", news.Title, news.Content, news.PublicationDate)
-	return err
+func (db *NewsDBImpl) CreateNews(news model.News) (int, error) {
+	var id int
+	err := db.conn.QueryRow("INSERT INTO news (title, content, publication_date) VALUES ($1, $2, $3) RETURNING id", news.Title, news.Content, news.PublicationDate).Scan(&id)
+	return id, err
 }
 
 func (db *NewsDBImpl) UpdateNews(news model.News) error {

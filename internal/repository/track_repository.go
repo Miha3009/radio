@@ -11,7 +11,7 @@ type TrackDB interface {
 	GetTracksCount() (int, error)
 	GetTrackById(id string) (*model.Track, error)
 	GetTrackList(offset, limit int, query string) ([]model.Track, error)
-	CreateTrack(track model.Track) error
+	CreateTrack(track model.Track) (int, error)
 	UpdateTrack(track model.Track) error
 	DeleteTrack(id string) error
 	IsTrackLiked(id, userId string) (bool, error)
@@ -82,9 +82,10 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 	return res, nil
 }
 
-func (db *TrackDBImpl) CreateTrack(track model.Track) error {
-	_, err := db.conn.Exec("INSERT INTO tracks (title, perfomancer, year) VALUES ($1, $2, $3)", track.Title, track.Perfomancer, track.Year)
-	return err
+func (db *TrackDBImpl) CreateTrack(track model.Track) (int, error) {
+	var id int
+	err := db.conn.QueryRow("INSERT INTO tracks (title, perfomancer, year) VALUES ($1, $2, $3) RETURNING id", track.Title, track.Perfomancer, track.Year).Scan(&id)
+	return id, err
 }
 
 func (db *TrackDBImpl) UpdateTrack(track model.Track) error {

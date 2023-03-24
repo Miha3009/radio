@@ -18,6 +18,10 @@ type GetNewsResponse struct {
 	Found           bool      `json:"-"`
 }
 
+type CreateNewsResponse struct {
+	ID string `json:"id"`
+}
+
 type UpdateNewsResponse struct {
 	Found bool `json:"-"`
 }
