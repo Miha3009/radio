@@ -32,3 +32,8 @@ type GetCurrentTrackResponse struct {
 	LikeCount    int           `json:"likeCount"`
 	CurrentTime  time.Duration `json:"currentTime"`
 }
+
+type GetScheduleResponse struct {
+	Past []model.Track `json:"past"`
+	Next []model.Track `json:"next"`
+}

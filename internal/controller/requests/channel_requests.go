@@ -49,3 +49,9 @@ type GetCurrentTrackRequest struct {
 	ID     string
 	UserID *string
 }
+
+type GetScheduleRequest struct {
+	ID   string
+	Past int
+	Next int
+}

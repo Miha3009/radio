@@ -226,6 +226,30 @@ func HandleGetCurrentTrack(ctx context.Context) (any, error) {
 	return res, nil
 }
 
+func HandleSchedule(ctx context.Context) (any, error) {
+	var request requests.GetScheduleRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	past, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("past"))
+	if err != nil {
+		past = 1000000
+	}
+	request.Past = past
+	next, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("next"))
+	if err != nil {
+		next = 1000000
+	}
+	request.Next = next
+
+	res, err := service.NewChannelService().GetSchedule(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil
+}
+
 type ConnectStruct struct {
 	ID string
 }
@@ -355,6 +379,7 @@ func RouteChannelPaths(
 	router.MethodFunc("POST", "/channel/{id}/upload-logo", handlers.MakeHandler(HandleUploadLogo, core))
 	router.MethodFunc("POST", "/channel/{id}/add-track", handlers.MakeHandler(HandleAddTrack, core))
 	router.MethodFunc("GET", "/channel/{id}/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetCurrentTrack), core))
+	router.MethodFunc("GET", "/channel/{id}/schedule", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleSchedule), core))
 
 	router.HandleFunc("/channel/{id}/connect",
 		func(w http.ResponseWriter, req *http.Request) {

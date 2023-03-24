@@ -21,6 +21,7 @@ type ChannelService interface {
 	UploadLogo(r requests.UploadLogoRequest) error
 	AddTrack(r requests.AddTrackRequest) error
 	GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error)
+	GetSchedule(r requests.GetScheduleRequest) (responses.GetScheduleResponse, error)
 }
 
 func NewChannelService() ChannelService {
@@ -156,6 +157,23 @@ func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) 
 	} else {
 		res.Liked = false
 	}
+
+	return res, nil
+}
+
+func (s *ChannelServiceImpl) GetSchedule(r requests.GetScheduleRequest) (responses.GetScheduleResponse, error) {
+	var res responses.GetScheduleResponse
+	pastTracks, err := s.db.GetPastTracks(r.ID, r.Past)
+	if err != nil {
+		return res, err
+	}
+	res.Past = pastTracks
+
+	nextTracks, err := s.db.GetNextTracks(r.ID, r.Next)
+	if err != nil {
+		return res, err
+	}
+	res.Next = nextTracks
 
 	return res, nil
 }

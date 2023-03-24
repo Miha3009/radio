@@ -17,6 +17,8 @@ type ChannelDB interface {
 	AddTrackToSchedule(id, trackid string, start, end time.Time) error
 	ChangeChannelStatus(id string, status model.ChannelStatus) error
 	ChangeLogo(id, logo string) error
+	GetPastTracks(id string, count int) ([]model.Track, error)
+	GetNextTracks(id string, count int) ([]model.Track, error)
 }
 
 func NewChannelDB() ChannelDB {
@@ -132,4 +134,58 @@ func (db *ChannelDBImpl) ChangeChannelStatus(id string, status model.ChannelStat
 func (db *ChannelDBImpl) ChangeLogo(id, logo string) error {
 	_, err := db.conn.Exec("UPDATE channels SET logo=$1 WHERE id=$2", logo, id)
 	return err
+}
+
+func (db *ChannelDBImpl) GetPastTracks(id string, count int) ([]model.Track, error) {
+	res := make([]model.Track, 0)
+	rows, err := db.conn.Query("SELECT tracks.id, tracks.title, tracks.performancer, tracks.year, tracks.audio, tracks.duration FROM tracks JOIN schedule ON schedule.trackid=tracks.id WHERE schedule.channelid=$1 AND schedule.startdate < NOW() ORDER BY schedule.startdate DESC LIMIT $2", id, count)
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var temp model.Track
+		var audio sql.NullString
+		var duration sql.NullInt64
+		err = rows.Scan(&temp.ID, &temp.Title, &temp.Performancer, &temp.Year, &audio, &duration)
+		if err != nil {
+			return res, err
+		}
+		if audio.Valid {
+			temp.Audio = audio.String
+		}
+		if duration.Valid {
+			temp.Duration = time.Duration(duration.Int64)
+		}
+		res = append(res, temp)
+	}
+
+	return res, nil
+}
+
+func (db *ChannelDBImpl) GetNextTracks(id string, count int) ([]model.Track, error) {
+	res := make([]model.Track, 0)
+	rows, err := db.conn.Query("SELECT tracks.id, tracks.title, tracks.performancer, tracks.year, tracks.audio, tracks.duration FROM tracks JOIN schedule ON schedule.trackid=tracks.id WHERE schedule.channelid=$1 AND schedule.startdate > NOW() ORDER BY schedule.startdate ASC LIMIT $2", id, count)
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var temp model.Track
+		var audio sql.NullString
+		var duration sql.NullInt64
+		err = rows.Scan(&temp.ID, &temp.Title, &temp.Performancer, &temp.Year, &audio, &duration)
+		if err != nil {
+			return res, err
+		}
+		if audio.Valid {
+			temp.Audio = audio.String
+		}
+		if duration.Valid {
+			temp.Duration = time.Duration(duration.Int64)
+		}
+		res = append(res, temp)
+	}
+
+	return res, nil
 }
