@@ -11,6 +11,7 @@ type GetTrackResponse struct {
 	Performancer string        `json:"performancer"`
 	Year         int           `json:"year"`
 	Duration     time.Duration `json:"duration"`
+	Audio        string        `json:"audio"`
 	Liked        bool          `json:"liked"`
 	Found        bool          `json:"-"`
 }

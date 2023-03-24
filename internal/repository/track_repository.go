@@ -47,7 +47,15 @@ func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 	}
 	defer rows.Close()
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Title, &res.Performancer, &res.Year, &res.Audio, &res.Duration)
+		var audio sql.NullString
+		var duration sql.NullInt64
+		err = rows.Scan(&res.ID, &res.Title, &res.Performancer, &res.Year, &audio, &duration)
+		if audio.Valid {
+			res.Audio = audio.String
+		}
+		if duration.Valid {
+			res.Duration = time.Duration(duration.Int64)
+		}
 		return &res, err
 	}
 
