@@ -19,9 +19,10 @@ type ChannelService interface {
 	StartChannel(r requests.StartChannelRequest) error
 	StopChannel(r requests.StopChannelRequest) error
 	UploadLogo(r requests.UploadLogoRequest) error
-	AddTrack(r requests.AddTrackRequest) error
+	AddTrack(r requests.AddTrackToScheduleRequest) error
 	GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error)
 	GetSchedule(r requests.GetScheduleRequest) (responses.GetScheduleResponse, error)
+	GetScheduleRange(r requests.GetScheduleRangeRequest) (responses.GetScheduleRangeResponse, error)
 }
 
 func NewChannelService() ChannelService {
@@ -118,13 +119,13 @@ func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) error {
 	return s.db.ChangeLogo(r.ID, r.Logo)
 }
 
-func (s *ChannelServiceImpl) AddTrack(r requests.AddTrackRequest) error {
+func (s *ChannelServiceImpl) AddTrack(r requests.AddTrackToScheduleRequest) error {
 	track, err := repository.NewTrackDB().GetTrackById(r.TrackID)
 	if err != nil {
 		return err
 	}
 
-	return s.db.AddTrackToSchedule(r.ID, r.TrackID, r.StartDate, r.StartDate.Add(track.Duration))
+	return repository.NewScheduleDB().AddTrackToSchedule(r.ChannelID, r.TrackID, r.StartDate, r.StartDate.Add(track.Duration))
 }
 
 func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error) {
@@ -163,17 +164,28 @@ func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) 
 
 func (s *ChannelServiceImpl) GetSchedule(r requests.GetScheduleRequest) (responses.GetScheduleResponse, error) {
 	var res responses.GetScheduleResponse
-	pastTracks, err := s.db.GetPastTracks(r.ID, r.Past)
+	pastTracks, err := repository.NewScheduleDB().GetPastTracks(r.ChannelID, r.Past)
 	if err != nil {
 		return res, err
 	}
 	res.Past = pastTracks
 
-	nextTracks, err := s.db.GetNextTracks(r.ID, r.Next)
+	nextTracks, err := repository.NewScheduleDB().GetNextTracks(r.ChannelID, r.Next)
 	if err != nil {
 		return res, err
 	}
 	res.Next = nextTracks
+
+	return res, nil
+}
+
+func (s *ChannelServiceImpl) GetScheduleRange(r requests.GetScheduleRangeRequest) (responses.GetScheduleRangeResponse, error) {
+	var res responses.GetScheduleRangeResponse
+	tracks, err := repository.NewScheduleDB().GetTracksInRange(r.ChannelID, r.From, r.To)
+	if err != nil {
+		return res, err
+	}
+	res.Tracks = tracks
 
 	return res, nil
 }

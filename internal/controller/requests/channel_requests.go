@@ -39,19 +39,19 @@ type UploadLogoRequest struct {
 	Logo string
 }
 
-type AddTrackRequest struct {
-	ID        string
-	TrackID   string    `json:"trackid"`
-	StartDate time.Time `json:"startdate"`
-}
-
 type GetCurrentTrackRequest struct {
 	ID     string
 	UserID *string
 }
 
 type GetScheduleRequest struct {
-	ID   string
-	Past int
-	Next int
+	ChannelID string
+	Past      int
+	Next      int
+}
+
+type GetScheduleRangeRequest struct {
+	ChannelID string
+	From      time.Time
+	To        time.Time
 }

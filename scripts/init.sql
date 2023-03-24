@@ -60,11 +60,12 @@ CREATE TABLE tracks_comments (
 );
 
 CREATE TABLE schedule (
+	id SERIAL PRIMARY KEY,
 	channelid INT REFERENCES channels(id) ON DELETE CASCADE,
 	trackid INT REFERENCES tracks(id) ON DELETE CASCADE,
 	startdate TIMESTAMP,
 	enddate TIMESTAMP,
-	PRIMARY KEY (channelid, trackid, startdate)
+	UNIQUE (channelid, startdate)
 );
 
 CREATE TABLE news (

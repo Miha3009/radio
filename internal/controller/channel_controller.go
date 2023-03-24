@@ -190,7 +190,7 @@ func HandleAddTrack(ctx context.Context) (any, error) {
 		return nil, nil
 	}
 
-	var request requests.AddTrackRequest
+	var request requests.AddTrackToScheduleRequest
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
 	err := decoder.Decode(&request)
 	if err != nil {
@@ -228,7 +228,7 @@ func HandleGetCurrentTrack(ctx context.Context) (any, error) {
 
 func HandleSchedule(ctx context.Context) (any, error) {
 	var request requests.GetScheduleRequest
-	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.ChannelID = chi.URLParam(ctx.GetRequest(), "id")
 
 	past, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("past"))
 	if err != nil {
@@ -242,6 +242,31 @@ func HandleSchedule(ctx context.Context) (any, error) {
 	request.Next = next
 
 	res, err := service.NewChannelService().GetSchedule(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func HandleScheduleRange(ctx context.Context) (any, error) {
+	var request requests.GetScheduleRangeRequest
+	request.ChannelID = chi.URLParam(ctx.GetRequest(), "id")
+
+	from, err := time.Parse(time.RFC3339, ctx.GetRequest().URL.Query().Get("from"))
+	fmt.Println(from, err)
+	if err != nil {
+		from = time.Now().Add(-time.Hour * 1000000)
+	}
+	request.From = from
+	to, err := time.Parse(time.RFC3339, ctx.GetRequest().URL.Query().Get("to"))
+	if err != nil {
+		to = time.Now().Add(time.Hour * 1000000)
+	}
+	request.To = to
+
+	res, err := service.NewChannelService().GetScheduleRange(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
@@ -380,6 +405,7 @@ func RouteChannelPaths(
 	router.MethodFunc("POST", "/channel/{id}/add-track", handlers.MakeHandler(HandleAddTrack, core))
 	router.MethodFunc("GET", "/channel/{id}/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetCurrentTrack), core))
 	router.MethodFunc("GET", "/channel/{id}/schedule", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleSchedule), core))
+	router.MethodFunc("GET", "/channel/{id}/schedule-range", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleScheduleRange), core))
 
 	router.HandleFunc("/channel/{id}/connect",
 		func(w http.ResponseWriter, req *http.Request) {

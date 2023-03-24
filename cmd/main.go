@@ -58,6 +58,7 @@ func main() {
 	core := handlers.NewCore(logger, userDB)
 	controller.RouteUserPaths(core, router)
 	controller.RouteChannelPaths(core, router)
+	controller.RouteSchedulePaths(core, router)
 	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
 	podcast.RoutePaths(core, router)

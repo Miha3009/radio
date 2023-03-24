@@ -34,6 +34,10 @@ type GetCurrentTrackResponse struct {
 }
 
 type GetScheduleResponse struct {
-	Past []model.Track `json:"past"`
-	Next []model.Track `json:"next"`
+	Past []model.ScheduleTrackFull `json:"past"`
+	Next []model.ScheduleTrackFull `json:"next"`
+}
+
+type GetScheduleRangeResponse struct {
+	Tracks []model.ScheduleTrackFull `json:"tracks"`
 }
