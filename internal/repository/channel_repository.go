@@ -2,13 +2,14 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"netradio/internal/model"
 	"netradio/pkg/database"
 	"time"
 )
 
 type ChannelDB interface {
-	GetChannels() ([]model.ChannelShortInfo, error)
+	GetChannels(offset, limit int, query, status string) ([]model.ChannelShortInfo, error)
 	GetChannelById(id string) (*model.ChannelInfo, error)
 	GetCurrentTrack(id string) (*model.Track, error)
 	CreateChannel(channel model.ChannelInfo) error
@@ -28,9 +29,16 @@ type ChannelDBImpl struct {
 	conn *sql.DB
 }
 
-func (db *ChannelDBImpl) GetChannels() ([]model.ChannelShortInfo, error) {
+func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([]model.ChannelShortInfo, error) {
 	res := make([]model.ChannelShortInfo, 0)
-	rows, err := db.conn.Query("SELECT id, title, logo FROM channels WHERE status=$1", model.ActiveChannel)
+	statusString := ""
+	if status == "active" {
+		statusString = " AND status=1"
+	} else if status == "stopped" {
+		statusString = " AND status=0"
+	}
+	query = "%" + query + "%"
+	rows, err := db.conn.Query(fmt.Sprintf("SELECT id, title, logo FROM channels WHERE title LIKE $3%s ORDER BY id OFFSET $1 LIMIT $2", statusString), offset, limit, query)
 	if err != nil {
 		return res, err
 	}

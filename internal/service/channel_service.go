@@ -11,7 +11,7 @@ import (
 )
 
 type ChannelService interface {
-	GetChannels() (responses.GetChannelsResponse, error)
+	GetChannels(r requests.GetChannelsRequest) (responses.GetChannelsResponse, error)
 	GetChannel(r requests.GetChannelRequest) (responses.GetChannelResponse, error)
 	CreateChannel(r requests.CreateChannelRequest) error
 	DeleteChannel(r requests.DeleteChannelRequest) error
@@ -35,9 +35,9 @@ type ChannelServiceImpl struct {
 	db repository.ChannelDB
 }
 
-func (s *ChannelServiceImpl) GetChannels() (responses.GetChannelsResponse, error) {
+func (s *ChannelServiceImpl) GetChannels(r requests.GetChannelsRequest) (responses.GetChannelsResponse, error) {
 	var res responses.GetChannelsResponse
-	channels, err := s.db.GetChannels()
+	channels, err := s.db.GetChannels(r.Offset, r.Limit, r.Query, r.Status)
 	if err != nil {
 		return res, err
 	}

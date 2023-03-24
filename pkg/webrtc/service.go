@@ -36,7 +36,7 @@ func StartAllChannels() {
 	channelsToTracks = make(map[string]*webrtc.TrackLocalStaticSample)
 	channelsToTrackTime = make(map[string]*time.Duration)
 
-	channels, err := repository.NewChannelDB().GetChannels()
+	channels, err := repository.NewChannelDB().GetChannels(0, 1000000, "", "")
 	if err != nil {
 		log.NewLogger().Fatal(err)
 	}

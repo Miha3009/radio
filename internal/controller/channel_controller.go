@@ -21,7 +21,21 @@ import (
 )
 
 func HandleGetChannels(ctx context.Context) (any, error) {
-	res, err := service.NewChannelService().GetChannels()
+	var request requests.GetChannelsRequest
+	offset, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("offset"))
+	if err != nil {
+		offset = 0
+	}
+	request.Offset = offset
+	limit, err := strconv.Atoi(ctx.GetRequest().URL.Query().Get("limit"))
+	if err != nil {
+		limit = 1000000
+	}
+	request.Limit = limit
+	request.Query = ctx.GetRequest().URL.Query().Get("query")
+	request.Status = ctx.GetRequest().URL.Query().Get("status")
+
+	res, err := service.NewChannelService().GetChannels(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err

@@ -2,6 +2,13 @@ package requests
 
 import "time"
 
+type GetChannelsRequest struct {
+	Offset int
+	Limit  int
+	Query  string
+	Status string
+}
+
 type GetChannelRequest struct {
 	ID string
 }
