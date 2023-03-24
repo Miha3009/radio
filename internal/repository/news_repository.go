@@ -53,7 +53,7 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 
 func (db *NewsDBImpl) GetNewsById(id string) (*model.News, error) {
 	var res model.News
-	rows, err := db.conn.Query("SELECT id, title, content, pubication_date FROM news WHERE id=$1", id)
+	rows, err := db.conn.Query("SELECT id, title, content, publication_date FROM news WHERE id=$1", id)
 	if err != nil {
 		return &res, err
 	}
