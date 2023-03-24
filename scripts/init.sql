@@ -72,6 +72,7 @@ CREATE TABLE news (
 	id SERIAL PRIMARY KEY,
 	title VARCHAR(255),
 	content TEXT,
+	image VARCHAR(255),
 	publication_date TIMESTAMP
 );
 
@@ -117,11 +118,107 @@ INSERT INTO schedule (channelid, trackid, startdate, enddate) VALUES
   (4, 4, NOW(), NOW() + interval '1' day),
   (5, 5, NOW(), NOW() + interval '1' day);
 
-INSERT INTO news (title, content, publication_date) VALUES
-  ('Новость 1', '# Заголовок', NOW() - interval '1' hour),
-  ('Новость 2', '# Заголовок', NOW() - interval '3' hour),
-  ('Новость 3', '# Заголовок', NOW() - interval '7' hour),
-  ('Новость 4', '# Заголовок', NOW() - interval '10' hour);
+INSERT INTO news (title, publication_date, image, content) VALUES
+  ('Новость 1', '# Заголовок', NOW(), 'files/image1.jpg', '# Adspicit domum
+
+## Venit et suae
+
+Lorem markdownum inpia et fatendo ad ignotas! Tu acrior manuum! Ciboque virgo
+vidi tamen, per cubat et aequoris capaci inire adolescere qui. Esse Arcton
+ignavi secutum. Pondus *nascentur fronde* loci quae, nascentia coniuge,
+[falsaque](http://hiccaelum.com/ipsesinat) defensus intus, multa petit redit
+metit laboris.
+
+Troiae sanguinis, nubila dat [tuum medicamine
+mihi](http://potest.io/saevo-quas.html) Cecropidum deum suppressis conchis
+pulcherrima pendet perhorruit iubeo Rutulum. Foedere corpora, rotat arbor enim,
+vinctoque rogat huic humo plaga, **aurea**? Quod tamen passa Syron vixisti
+suique: fundae tota, de cum Rex! Siquis patebat emerguntque suasit praecluserat
+ab cvrrvs iussus aequare inposita bello ter pennatis quamquam me vincla sic
+fingetur, vivacemque!
+
+## Est iecur cursu
+
+Mortalem aera; vilibus Thessala rettulit et et omnes delia. Alis Caicum, lucent
+oculis: nimbos et addit factisque terrore dementer quidem incaluitque solet?
+
+    if (simplex_flash_degauss != drmPptpVideo.vlog(utility_pmu, 71)) {
+        snow_bankruptcy_dial(parityPermalinkBittorrent);
+        utf_piracy += rgbProgramMemory - zipHfsSuperscalar;
+    } else {
+        cleanSystem.play -= 925592;
+    }
+    search = algorithm / digital_optical + android * flatbedBootMicrocomputer *
+            firewire_faq_flat + softwareRawAnimated;
+    broadband_servlet_asp(33);
+    if (phreaking + bug_tag == ospf_path_operating - associationSku) {
+        typeface_duplex_optical(backside_irq);
+        cursor_smartphone.rowSkinRuntime += reality_bounce(833825);
+    }
+    trojanExcel = packet;
+
+## Fluctus mihi auctor fratres despectus manifesta cunas
+
+Veste flexi quare arces deprensi et parte. Vos illis, prensoque tegitur, et
+vulnera nostro, quid. Vultu fessa nat fronte hiatus?
+
+    if (pipelineBootName) {
+        tweakBankruptcy = 71;
+        vpiWwwGis += mashup_dvr;
+        smb_memory = 2;
+    }
+    type(youtubeShell, phpPrebindingToslink(5));
+    var server = multimedia_wordart_hashtag + nat_gnu_prebinding;
+    if (expansionSmbCharacter + active + data >= pitchAddressMeta + unit) {
+        bar.softwareGigaflops = menu(file_soft + halftone, software_point,
+                megabyteIvrPrint);
+        gatewayW = clipboardLag / cycleIcmp + down_install_jumper;
+        compactLan(program_pptp + wDrag);
+    }
+
+## Arva amas intendit
+
+Ire pes lacrimas manus regia, nisi mihi aures rabiem imis inque fore geminae.
+*Sibi concussit papavera* fuit pectora?
+
+*Non circuit arcebatque* stramine lata hospes Cepheni facilem totosque,
+traxerunt motibus deorum fama eum forte sub et Penthea. Querellae terraque
+crepitantia manus terribilesque manus putes; suas, et ipse si igne texique,
+siqua, et. Totum bracchia duris vivitur doleret? Ruinae ventos ac Finierat agmen
+gemitus quodque meus eam procul patefecit? Misero fratrisque, materiem corpore,
+oculos qua.'),
+  ('Новость 2', NOW() - interval '1' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 3', NOW() - interval '2' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 4', NOW() - interval '3' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 5', NOW() - interval '4' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 6', NOW() - interval '5' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 7', NOW() - interval '6' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 8', NOW() - interval '7' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 9', NOW() - interval '8' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 10', NOW() - interval '9' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 11', NOW() - interval '10' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 12', NOW() - interval '11' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 13', NOW() - interval '12' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 14', NOW() - interval '13' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 15', NOW() - interval '14' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 16', NOW() - interval '15' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 17', NOW() - interval '16' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 18', NOW() - interval '17' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 19', NOW() - interval '18' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 20', NOW() - interval '19' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 21', NOW() - interval '20' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 22', NOW() - interval '21' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 23', NOW() - interval '22' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 24', NOW() - interval '23' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 25', NOW() - interval '24' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 26', NOW() - interval '25' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 27', NOW() - interval '26' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 28', NOW() - interval '27' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 29', NOW() - interval '28' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 30', NOW() - interval '29' hour, 'files/image3.jpg', '# Заголовок'),
+  ('Новость 31', NOW() - interval '30' hour, 'files/image1.jpg', '# Заголовок'),
+  ('Новость 32', NOW() - interval '31' hour, 'files/image2.jpg', '# Заголовок'),
+  ('Новость 33', NOW() - interval '32' hour, 'files/image3.jpg', '# Заголовок');
 
 INSERT INTO comments (userid, parent, text, time) VALUES
   (1, NULL, 'Я первый', NOW() - interval '20' minute),

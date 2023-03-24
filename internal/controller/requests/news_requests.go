@@ -24,3 +24,8 @@ type UpdateNewsRequest struct {
 type DeleteNewsRequest struct {
 	ID string
 }
+
+type UploadImageRequest struct {
+	ID    string
+	Image string
+}

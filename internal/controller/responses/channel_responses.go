@@ -41,3 +41,7 @@ type GetScheduleResponse struct {
 type GetScheduleRangeResponse struct {
 	Tracks []model.ScheduleTrackFull `json:"tracks"`
 }
+
+type UploadLogoResponse struct {
+	Logo string `json:"logo"`
+}

@@ -13,6 +13,7 @@ type NewsDB interface {
 	CreateNews(news model.News) (int, error)
 	UpdateNews(news model.News) error
 	DeleteNews(id string) error
+	ChangeImage(id, image string) error
 }
 
 func NewNewsDB() NewsDB {
@@ -34,16 +35,20 @@ func (db *NewsDBImpl) GetNewsCount() (int, error) {
 func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, error) {
 	res := make([]model.NewsShortInfo, 0)
 	query = "%" + query + "%"
-	rows, err := db.conn.Query("SELECT id, title, publication_date FROM news WHERE title LIKE $3 ORDER BY publication_date OFFSET $1 LIMIT $2", offset, limit, query)
+	rows, err := db.conn.Query("SELECT id, title, publication_date, image FROM news WHERE title LIKE $3 ORDER BY publication_date OFFSET $1 LIMIT $2", offset, limit, query)
 	if err != nil {
 		return res, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var temp model.NewsShortInfo
-		err = rows.Scan(&temp.ID, &temp.Title, &temp.PublicationDate)
+		var image sql.NullString
+		err = rows.Scan(&temp.ID, &temp.Title, &temp.PublicationDate, &image)
 		if err != nil {
 			return res, err
+		}
+		if image.Valid {
+			temp.Image = image.String
 		}
 		res = append(res, temp)
 	}
@@ -53,13 +58,17 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 
 func (db *NewsDBImpl) GetNewsById(id string) (*model.News, error) {
 	var res model.News
-	rows, err := db.conn.Query("SELECT id, title, content, publication_date FROM news WHERE id=$1", id)
+	rows, err := db.conn.Query("SELECT id, title, content, publication_date, image FROM news WHERE id=$1", id)
 	if err != nil {
 		return &res, err
 	}
 	defer rows.Close()
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Title, &res.Content, &res.PublicationDate)
+		var image sql.NullString
+		err = rows.Scan(&res.ID, &res.Title, &res.Content, &res.PublicationDate, &image)
+		if image.Valid {
+			res.Image = image.String
+		}
 		return &res, err
 	}
 
@@ -79,5 +88,10 @@ func (db *NewsDBImpl) UpdateNews(news model.News) error {
 
 func (db *NewsDBImpl) DeleteNews(id string) error {
 	_, err := db.conn.Exec("DELETE FROM news WHERE id=$1", id)
+	return err
+}
+
+func (db *NewsDBImpl) ChangeImage(id, image string) error {
+	_, err := db.conn.Exec("UPDATE news SET image=$1 WHERE id=$2", image, id)
 	return err
 }

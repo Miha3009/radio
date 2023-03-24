@@ -15,6 +15,7 @@ type NewsService interface {
 	CreateNews(r requests.CreateNewsRequest) (responses.CreateNewsResponse, error)
 	DeleteNews(r requests.DeleteNewsRequest) error
 	UpdateNews(r requests.UpdateNewsRequest) (responses.UpdateNewsResponse, error)
+	UploadImage(r requests.UploadImageRequest) (responses.UploadImageResponse, error)
 }
 
 func NewNewsService() NewsService {
@@ -108,6 +109,18 @@ func (s *NewsServiceImpl) UpdateNews(r requests.UpdateNewsRequest) (responses.Up
 	if err != nil {
 		return res, err
 	}
+
+	return res, nil
+}
+
+func (s *NewsServiceImpl) UploadImage(r requests.UploadImageRequest) (responses.UploadImageResponse, error) {
+	var res responses.UploadImageResponse
+	err := s.db.ChangeImage(r.ID, r.Image)
+	if err != nil {
+		return res, err
+	}
+
+	res.Image = r.Image
 
 	return res, nil
 }

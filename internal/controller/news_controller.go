@@ -7,6 +7,7 @@ import (
 	"netradio/internal/model"
 	"netradio/internal/service"
 	"netradio/pkg/context"
+	"netradio/pkg/files"
 	"netradio/pkg/handlers"
 	"strconv"
 
@@ -125,6 +126,31 @@ func HandleUpdateNews(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
+func HandleUploadImage(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	path, err := files.Save(ctx.GetRequest())
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	var request requests.UploadImageRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.Image = path
+
+	res, err := service.NewNewsService().UploadImage(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil
+}
 func RouteNewsPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -134,4 +160,5 @@ func RouteNewsPaths(
 	router.MethodFunc("PUT", "/news", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleCreateNews), core))
 	router.MethodFunc("DELETE", "/news/{id}", handlers.MakeHandler(HandleDeleteNews, core))
 	router.MethodFunc("PATCH", "/news/{id}", handlers.MakeHandler(HandleUpdateNews, core))
+	router.MethodFunc("POST", "/news/{id}/upload-image", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleUploadImage), core))
 }

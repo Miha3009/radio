@@ -18,7 +18,7 @@ type ChannelService interface {
 	UpdateChannel(r requests.UpdateChannelRequest) (responses.UpdateChannelResponse, error)
 	StartChannel(r requests.StartChannelRequest) error
 	StopChannel(r requests.StopChannelRequest) error
-	UploadLogo(r requests.UploadLogoRequest) error
+	UploadLogo(r requests.UploadLogoRequest) (responses.UploadLogoResponse, error)
 	AddTrack(r requests.AddTrackToScheduleRequest) error
 	GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error)
 	GetSchedule(r requests.GetScheduleRequest) (responses.GetScheduleResponse, error)
@@ -115,8 +115,16 @@ func (s *ChannelServiceImpl) StopChannel(r requests.StopChannelRequest) error {
 	return s.db.ChangeChannelStatus(r.ID, model.StoppedChannel)
 }
 
-func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) error {
-	return s.db.ChangeLogo(r.ID, r.Logo)
+func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) (responses.UploadLogoResponse, error) {
+	var res responses.UploadLogoResponse
+	err := s.db.ChangeLogo(r.ID, r.Logo)
+	if err != nil {
+		return res, err
+	}
+
+	res.Logo = r.Logo
+
+	return res, nil
 }
 
 func (s *ChannelServiceImpl) AddTrack(r requests.AddTrackToScheduleRequest) error {

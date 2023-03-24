@@ -188,13 +188,13 @@ func HandleUploadLogo(ctx context.Context) (any, error) {
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
 	request.Logo = path
 
-	err = service.NewChannelService().UploadLogo(request)
+	res, err := service.NewChannelService().UploadLogo(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 
-	return nil, nil
+	return res, nil
 }
 
 func HandleAddTrack(ctx context.Context) (any, error) {
@@ -415,7 +415,7 @@ func RouteChannelPaths(
 	router.MethodFunc("PATCH", "/channel/{id}", handlers.MakeHandler(HandleUpdateChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/start", handlers.MakeHandler(HandleStartChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/stop", handlers.MakeHandler(HandleStopChannel, core))
-	router.MethodFunc("POST", "/channel/{id}/upload-logo", handlers.MakeHandler(HandleUploadLogo, core))
+	router.MethodFunc("POST", "/channel/{id}/upload-logo", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleUploadLogo), core))
 	router.MethodFunc("POST", "/channel/{id}/add-track", handlers.MakeHandler(HandleAddTrack, core))
 	router.MethodFunc("GET", "/channel/{id}/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetCurrentTrack), core))
 	router.MethodFunc("GET", "/channel/{id}/schedule", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleSchedule), core))
