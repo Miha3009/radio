@@ -119,7 +119,7 @@ INSERT INTO schedule (channelid, trackid, startdate, enddate) VALUES
   (5, 5, NOW(), NOW() + interval '1' day);
 
 INSERT INTO news (title, publication_date, image, content) VALUES
-  ('Новость 1', '# Заголовок', NOW(), 'files/image1.jpg', '# Adspicit domum
+  ('Новость 1', NOW(), 'files/image1.jpg', '# Adspicit domum
 
 ## Venit et suae
 
