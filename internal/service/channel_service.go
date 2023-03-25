@@ -7,6 +7,7 @@ import (
 	"netradio/internal/model"
 	"netradio/internal/repository"
 	"netradio/pkg/stats"
+	"netradio/pkg/webrtc"
 	webrtchelper "netradio/pkg/webrtc"
 	"strconv"
 )
@@ -83,10 +84,15 @@ func (s *ChannelServiceImpl) CreateChannel(r requests.CreateChannelRequest) (res
 	}
 	res.ID = strconv.Itoa(id)
 
+	webrtc.StartChannel(res.ID)
+	stats.SetChannelStatus(res.ID, channel.Status)
+	stats.RunForChannel(res.ID)
+
 	return res, nil
 }
 
 func (s *ChannelServiceImpl) DeleteChannel(r requests.DeleteChannelRequest) error {
+	stats.SetChannelStatus(r.ID, model.DeletedChannel)
 	return s.db.DeleteChannel(r.ID)
 }
 

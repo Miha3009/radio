@@ -62,6 +62,7 @@ func main() {
 	controller.RouteSchedulePaths(core, router)
 	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
+	controller.RouteStatsPaths(core, router)
 	webrtc.StartAllChannels()
 	files.StartFileServer(router)
 

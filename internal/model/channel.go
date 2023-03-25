@@ -15,6 +15,7 @@ type ChannelStatus int
 const (
 	StoppedChannel ChannelStatus = 0
 	ActiveChannel                = 1
+	DeletedChannel               = 2
 )
 
 type ChannelShortInfo struct {

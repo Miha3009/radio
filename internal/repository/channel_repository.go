@@ -87,7 +87,7 @@ func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {
 
 func (db *ChannelDBImpl) GetCurrentTrack(id string) (*model.Track, error) {
 	var res model.Track
-	rows, err := db.conn.Query("SELECT tracks.id, tracks.title, tracks.performancer, tracks.year, tracks.audio, tracks.duration FROM schedule JOIN tracks ON tracks.id=schedule.trackid WHERE channelid=$1 AND NOW() between startdate AND enddate LIMIT 1", id)
+	rows, err := db.conn.Query("SELECT tracks.id, tracks.title, tracks.performancer, tracks.year, tracks.audio, tracks.duration FROM schedule JOIN tracks ON tracks.id=schedule.trackid WHERE channelid=$1 AND NOW() BETWEEN startdate AND enddate LIMIT 1", id)
 	if err != nil {
 		return nil, err
 	}

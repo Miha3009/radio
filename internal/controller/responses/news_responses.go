@@ -14,7 +14,7 @@ type GetNewsResponse struct {
 	ID              string    `json:"id"`
 	Title           string    `json:"title"`
 	Content         string    `json:"content"`
-	PublicationDate time.Time `json:"publication_date"`
+	PublicationDate time.Time `json:"date"`
 	Image           string    `json:"image"`
 	Liked           bool      `json:"liked"`
 	LikeCount       int       `json:"likeCount"`

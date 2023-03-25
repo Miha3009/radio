@@ -5,7 +5,7 @@ import "time"
 type News struct {
 	ID              int       `json:"id"`
 	Title           string    `json:"title"`
-	PublicationDate time.Time `json:"publication_date"`
+	PublicationDate time.Time `json:"date"`
 	Content         string    `json:"content"`
 	Image           string    `json:"image"`
 }

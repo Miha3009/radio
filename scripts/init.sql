@@ -89,6 +89,13 @@ CREATE TABLE news_comments (
 	PRIMARY KEY (newsid, commentid)	
 );
 
+CREATE TABLE listeners_stat (
+	channelid INT REFERENCES channels(id) ON DELETE CASCADE,
+	time TIMESTAMP WITH TIME ZONE,
+	count INT,
+	PRIMARY KEY (channelid, time)
+);
+
 INSERT INTO users (name, email, password, role, avatar) VALUES 
   ('Admin', 'admin@yandex.ru', '$2a$10$NN9YDCE77tR/BhahmtwoWOcpC9zjs3InRrtQamBzqBQvN0YgR3U3q', 2, NULL),
   ('User 1', 'user1@yandex.ru', '$2a$10$H3RLgGWd6I872d1JTPiEXOyuL3x6SyfdvMoAEPQaGCupbZPuvJs6a', 1, 'files/avatar-1.jpg'),

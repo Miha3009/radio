@@ -5,6 +5,7 @@ import (
 	"netradio/internal/repository"
 	"netradio/pkg/log"
 	"sync"
+	"time"
 )
 
 var (
@@ -35,6 +36,16 @@ func Init() {
 	}
 	for i := range tracks {
 		trackLikes[tracks[i]] = likes[i]
+	}
+
+	channels, _, err := repository.NewChannelDB().GetChannels(0, 1000000, "", "")
+	if err != nil {
+		log.NewLogger().Fatal(err)
+	}
+
+	for _, channel := range channels {
+		SetChannelStatus(channel.ID, channel.Status)
+		go RunForChannel(channel.ID)
 	}
 }
 
@@ -127,5 +138,15 @@ func GetChannelStatus(channelID string) model.ChannelStatus {
 		return status
 	} else {
 		return model.StoppedChannel
+	}
+}
+
+func RunForChannel(channelID string) {
+	ticker := time.NewTicker(time.Second * 10)
+	for ; true; <-ticker.C {
+		if GetChannelStatus(channelID) == model.DeletedChannel {
+			return
+		}
+		repository.NewStatsDB().AddListenerTimestamp(channelID, GetListeners(channelID))
 	}
 }

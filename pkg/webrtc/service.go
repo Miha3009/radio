@@ -48,7 +48,6 @@ func StartAllChannels() {
 	}
 
 	for _, channel := range channels {
-		stats.SetChannelStatus(channel.ID, channel.Status)
 		go StartChannel(channel.ID)
 	}
 }
@@ -65,8 +64,16 @@ func StartChannel(channelID string) {
 	channelsToTrackTime[channelID] = &currentTime
 
 	for {
-		for stats.GetChannelStatus(channelID) != model.ActiveChannel {
-			time.Sleep(time.Second)
+		for {
+			if stat := stats.GetChannelStatus(channelID); stat == model.StoppedChannel {
+				time.Sleep(time.Second)
+			} else {
+				if stat == model.DeletedChannel {
+					return
+				} else {
+					break
+				}
+			}
 		}
 
 		track, err := repository.NewChannelDB().GetCurrentTrack(channelID)

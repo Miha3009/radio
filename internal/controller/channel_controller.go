@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"netradio/internal/controller/requests"
 	"netradio/internal/model"
@@ -268,7 +267,6 @@ func HandleScheduleRange(ctx context.Context) (any, error) {
 	request.ChannelID = chi.URLParam(ctx.GetRequest(), "id")
 
 	from, err := time.Parse(time.RFC3339, ctx.GetRequest().URL.Query().Get("from"))
-	fmt.Println(from, err)
 	if err != nil {
 		from = time.Now().Add(-time.Hour * 1000000)
 	}
