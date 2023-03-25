@@ -17,7 +17,6 @@ import (
 	"github.com/go-chi/cors"
 
 	"netradio/internal/controller"
-	"netradio/internal/podcast"
 	"netradio/internal/repository"
 	"netradio/pkg/config"
 	"netradio/pkg/database"
@@ -61,7 +60,6 @@ func main() {
 	controller.RouteSchedulePaths(core, router)
 	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
-	podcast.RoutePaths(core, router)
 	webrtc.StartAllChannels()
 	files.StartFileServer(router)
 
