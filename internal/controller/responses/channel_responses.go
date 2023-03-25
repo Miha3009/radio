@@ -32,6 +32,7 @@ type GetCurrentTrackResponse struct {
 	Liked        bool          `json:"liked"`
 	LikeCount    int           `json:"likeCount"`
 	CurrentTime  time.Duration `json:"currentTime"`
+	Listeners    int           `json:"listeners"`
 }
 
 type GetScheduleResponse struct {
