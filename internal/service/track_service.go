@@ -55,6 +55,12 @@ func (s *TrackServiceImpl) GetTrack(r requests.GetTrackRequest) (responses.GetTr
 	res.Duration = track.Duration
 	res.Audio = track.Audio
 
+	likeCount, err := s.db.LikeCount(r.ID)
+	if err != nil {
+		return res, err
+	}
+	res.LikeCount = likeCount
+
 	if r.UserID != nil {
 		liked, err := s.db.IsTrackLiked(r.ID, *r.UserID)
 		if err != nil {

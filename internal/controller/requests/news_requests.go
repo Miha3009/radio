@@ -7,7 +7,8 @@ type GetNewsListRequest struct {
 }
 
 type GetNewsRequest struct {
-	ID string
+	ID     string
+	UserID *string
 }
 
 type CreateNewsRequest struct {
@@ -28,4 +29,21 @@ type DeleteNewsRequest struct {
 type UploadImageRequest struct {
 	ID    string
 	Image string
+}
+
+type LikeNewsRequest struct {
+	ID     string
+	UserID int
+	Like   bool `json:"like"`
+}
+
+type GetNewsCommentsRequest struct {
+	ID string
+}
+
+type CommentNewsRequest struct {
+	ID     string
+	UserID int
+	Text   string  `json:"text"`
+	Parent *string `json:"parent,omitempty"`
 }

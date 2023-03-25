@@ -13,6 +13,7 @@ type GetTrackResponse struct {
 	Duration     time.Duration `json:"duration"`
 	Audio        string        `json:"audio"`
 	Liked        bool          `json:"liked"`
+	LikeCount    int           `json:"likeCount"`
 	Found        bool          `json:"-"`
 }
 

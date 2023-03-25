@@ -41,6 +41,12 @@ func HandleGetNews(ctx context.Context) (any, error) {
 	var request requests.GetNewsRequest
 	request.ID = chi.URLParam(ctx.GetRequest(), "id")
 
+	user := ctx.GetUser()
+	if user.Role != model.UserGuest {
+		userId := strconv.Itoa(user.ID)
+		request.UserID = &userId
+	}
+
 	res, err := service.NewNewsService().GetNews(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
@@ -151,6 +157,72 @@ func HandleUploadImage(ctx context.Context) (any, error) {
 
 	return res, nil
 }
+
+func HandleLikeNews(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role == model.UserGuest {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.LikeNewsRequest
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.UserID = user.ID
+
+	err = service.NewNewsService().LikeNews(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func HandleGetNewsComments(ctx context.Context) (any, error) {
+	var request requests.GetNewsCommentsRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	res, err := service.NewNewsService().GetNewsComments(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func HandleCommentNews(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role == model.UserGuest {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.CommentNewsRequest
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+	request.UserID = user.ID
+
+	res, err := service.NewNewsService().CommentNews(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func RouteNewsPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -161,4 +233,7 @@ func RouteNewsPaths(
 	router.MethodFunc("DELETE", "/news/{id}", handlers.MakeHandler(HandleDeleteNews, core))
 	router.MethodFunc("PATCH", "/news/{id}", handlers.MakeHandler(HandleUpdateNews, core))
 	router.MethodFunc("POST", "/news/{id}/upload-image", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleUploadImage), core))
+	router.MethodFunc("POST", "/news/{id}/like", handlers.MakeHandler(HandleLikeNews, core))
+	router.MethodFunc("GET", "/news/{id}/comment", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetNewsComments), core))
+	router.MethodFunc("POST", "/news/{id}/comment", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleCommentNews), core))
 }

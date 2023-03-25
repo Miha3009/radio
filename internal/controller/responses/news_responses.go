@@ -16,6 +16,8 @@ type GetNewsResponse struct {
 	Content         string    `json:"content"`
 	PublicationDate time.Time `json:"publication_date"`
 	Image           string    `json:"image"`
+	Liked           bool      `json:"liked"`
+	LikeCount       int       `json:"likeCount"`
 	Found           bool      `json:"-"`
 }
 
@@ -29,4 +31,12 @@ type UpdateNewsResponse struct {
 
 type UploadImageResponse struct {
 	Image string `json:"image"`
+}
+
+type GetNewsCommentsResponse struct {
+	Comments []model.Comment `json:"comments"`
+}
+
+type CommentNewsResponse struct {
+	ID int `json:"id"`
 }

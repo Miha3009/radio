@@ -7,8 +7,8 @@ database:
   host: "localhost"
   port: 5432
   dbname: "radio"
-  user: "miha3009"
-  password: "password"
+  user: "postgres"
+  password: "1"
 
 email:
     from: "inbox@netradio.com"

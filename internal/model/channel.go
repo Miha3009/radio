@@ -33,7 +33,7 @@ type ScheduleTrack struct {
 
 type ScheduleTrackFull struct {
 	ID        string     `json:"id"`
-	Track     Track      `json:"trackid"`
+	Track     Track      `json:"track"`
 	ChannelId string     `json:"channelid"`
 	StartDate *time.Time `json:"startdate"`
 	EndDate   *time.Time `json:"enddate"`

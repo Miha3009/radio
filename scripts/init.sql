@@ -34,7 +34,7 @@ CREATE TABLE comments (
 	userid INT REFERENCES users(id) ON DELETE CASCADE,
 	parent INT REFERENCES comments(id) ON DELETE CASCADE,
 	text TEXT,
-	time TIMESTAMP
+	time TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE tracks (
@@ -63,8 +63,8 @@ CREATE TABLE schedule (
 	id SERIAL PRIMARY KEY,
 	channelid INT REFERENCES channels(id) ON DELETE CASCADE,
 	trackid INT REFERENCES tracks(id) ON DELETE CASCADE,
-	startdate TIMESTAMP,
-	enddate TIMESTAMP,
+	startdate TIMESTAMP WITH TIME ZONE,
+	enddate TIMESTAMP WITH TIME ZONE,
 	UNIQUE (channelid, startdate)
 );
 
@@ -73,13 +73,13 @@ CREATE TABLE news (
 	title VARCHAR(255),
 	content TEXT,
 	image VARCHAR(255),
-	publication_date TIMESTAMP
+	publication_date TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE news_likes (
 	userid INT REFERENCES users(id) ON DELETE CASCADE,
 	newsid INT REFERENCES news(id) ON DELETE CASCADE,
-	time TIMESTAMP,
+	time TIMESTAMP WITH TIME ZONE,
 	PRIMARY KEY (userid, newsid)
 );
 
