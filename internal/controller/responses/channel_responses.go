@@ -45,3 +45,7 @@ type GetScheduleRangeResponse struct {
 type UploadLogoResponse struct {
 	Logo string `json:"logo"`
 }
+
+type CreateChannelResponse struct {
+	ID string `json:"id"`
+}

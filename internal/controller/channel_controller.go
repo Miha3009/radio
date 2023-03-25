@@ -74,13 +74,13 @@ func HandleCreateChannel(ctx context.Context) (any, error) {
 		return nil, err
 	}
 
-	err = service.NewChannelService().CreateChannel(request)
+	res, err := service.NewChannelService().CreateChannel(request)
 	if err != nil {
 		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
 		return nil, err
 	}
 
-	return nil, nil
+	return res, nil
 }
 
 func HandleDeleteChannel(ctx context.Context) (any, error) {
@@ -203,6 +203,7 @@ func HandleAddTrack(ctx context.Context) (any, error) {
 	}
 
 	var request requests.AddTrackToScheduleRequest
+	request.ChannelID = chi.URLParam(ctx.GetRequest(), "id")
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
 	err := decoder.Decode(&request)
 	if err != nil {
@@ -293,7 +294,7 @@ func RouteChannelPaths(
 ) {
 	router.MethodFunc("GET", "/channel", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetChannels), core))
 	router.MethodFunc("GET", "/channel/{id}", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetChannel), core))
-	router.MethodFunc("PUT", "/channel", handlers.MakeHandler(HandleCreateChannel, core))
+	router.MethodFunc("PUT", "/channel", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleCreateChannel), core))
 	router.MethodFunc("DELETE", "/channel/{id}", handlers.MakeHandler(HandleDeleteChannel, core))
 	router.MethodFunc("PATCH", "/channel/{id}", handlers.MakeHandler(HandleUpdateChannel, core))
 	router.MethodFunc("POST", "/channel/{id}/start", handlers.MakeHandler(HandleStartChannel, core))

@@ -10,7 +10,7 @@ import (
 )
 
 type ScheduleDB interface {
-	AddTrackToSchedule(id, trackid string, start, end time.Time) error
+	AddTrackToSchedule(channelid, trackid string, start, end time.Time) error
 	GetPastTracks(id string, count int) ([]model.ScheduleTrackFull, error)
 	GetNextTracks(id string, count int) ([]model.ScheduleTrackFull, error)
 	GetTracksInRange(id string, from, to time.Time) ([]model.ScheduleTrackFull, error)
@@ -28,8 +28,9 @@ type ScheduleDBImpl struct {
 	conn *sql.DB
 }
 
-func (db *ScheduleDBImpl) AddTrackToSchedule(id, trackid string, start, end time.Time) error {
-	_, err := db.conn.Exec("INSERT INTO schedule (channelid, trackid, start, end)")
+func (db *ScheduleDBImpl) AddTrackToSchedule(channelid, trackid string, start, end time.Time) error {
+	fmt.Println(channelid, trackid, start, end)
+	_, err := db.conn.Exec("INSERT INTO schedule (channelid, trackid, startdate, enddate) VALUES ($1, $2, $3, $4)", channelid, trackid, start, end)
 	return err
 }
 

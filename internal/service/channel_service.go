@@ -13,7 +13,7 @@ import (
 type ChannelService interface {
 	GetChannels(r requests.GetChannelsRequest) (responses.GetChannelsResponse, error)
 	GetChannel(r requests.GetChannelRequest) (responses.GetChannelResponse, error)
-	CreateChannel(r requests.CreateChannelRequest) error
+	CreateChannel(r requests.CreateChannelRequest) (responses.CreateChannelResponse, error)
 	DeleteChannel(r requests.DeleteChannelRequest) error
 	UpdateChannel(r requests.UpdateChannelRequest) (responses.UpdateChannelResponse, error)
 	StartChannel(r requests.StartChannelRequest) error
@@ -68,12 +68,20 @@ func (s *ChannelServiceImpl) GetChannel(r requests.GetChannelRequest) (responses
 	return res, nil
 }
 
-func (s *ChannelServiceImpl) CreateChannel(r requests.CreateChannelRequest) error {
+func (s *ChannelServiceImpl) CreateChannel(r requests.CreateChannelRequest) (responses.CreateChannelResponse, error) {
+	var res responses.CreateChannelResponse
 	var channel model.ChannelInfo
 	channel.Title = r.Title
 	channel.Description = r.Description
 	channel.Status = model.StoppedChannel
-	return s.db.CreateChannel(channel)
+
+	id, err := s.db.CreateChannel(channel)
+	if err != nil {
+		return res, err
+	}
+	res.ID = strconv.Itoa(id)
+
+	return res, nil
 }
 
 func (s *ChannelServiceImpl) DeleteChannel(r requests.DeleteChannelRequest) error {
@@ -128,12 +136,7 @@ func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) (responses
 }
 
 func (s *ChannelServiceImpl) AddTrack(r requests.AddTrackToScheduleRequest) error {
-	track, err := repository.NewTrackDB().GetTrackById(r.TrackID)
-	if err != nil {
-		return err
-	}
-
-	return repository.NewScheduleDB().AddTrackToSchedule(r.ChannelID, r.TrackID, r.StartDate, r.StartDate.Add(track.Duration))
+	return repository.NewScheduleDB().AddTrackToSchedule(r.ChannelID, r.TrackID, r.StartDate, r.EndDate)
 }
 
 func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error) {

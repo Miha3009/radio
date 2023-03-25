@@ -12,7 +12,7 @@ type ChannelDB interface {
 	GetChannels(offset, limit int, query, status string) ([]model.ChannelShortInfo, error)
 	GetChannelById(id string) (*model.ChannelInfo, error)
 	GetCurrentTrack(id string) (*model.Track, error)
-	CreateChannel(channel model.ChannelInfo) error
+	CreateChannel(channel model.ChannelInfo) (int, error)
 	UpdateChannel(channel model.ChannelInfo) error
 	DeleteChannel(id string) error
 	ChangeChannelStatus(id string, status model.ChannelStatus) error
@@ -111,9 +111,10 @@ func (db *ChannelDBImpl) GetCurrentTrack(id string) (*model.Track, error) {
 	return nil, nil
 
 }
-func (db *ChannelDBImpl) CreateChannel(channel model.ChannelInfo) error {
-	_, err := db.conn.Exec("INSERT INTO channels (title, description, status) VALUES ($1, $2, $3)", channel.Title, channel.Description, channel.Status)
-	return err
+func (db *ChannelDBImpl) CreateChannel(channel model.ChannelInfo) (int, error) {
+	var id int
+	err := db.conn.QueryRow("INSERT INTO channels (title, description, status) VALUES ($1, $2, $3) RETURNING id", channel.Title, channel.Description, channel.Status).Scan(&id)
+	return id, err
 }
 
 func (db *ChannelDBImpl) UpdateChannel(channel model.ChannelInfo) error {
