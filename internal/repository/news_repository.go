@@ -8,8 +8,7 @@ import (
 )
 
 type NewsDB interface {
-	GetNewsCount() (int, error)
-	GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, error)
+	GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, int, error)
 	GetNewsById(id string) (*model.News, error)
 	CreateNews(news model.News) (int, error)
 	UpdateNews(news model.News) error
@@ -33,18 +32,12 @@ type NewsDBImpl struct {
 	conn *sql.DB
 }
 
-func (db *NewsDBImpl) GetNewsCount() (int, error) {
-	count := 0
-	err := db.conn.QueryRow("SELECT COUNT(*) FROM news").Scan(&count)
-	return count, err
-}
-
-func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, error) {
+func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.NewsShortInfo, int, error) {
 	res := make([]model.NewsShortInfo, 0)
 	query = "%" + query + "%"
 	rows, err := db.conn.Query("SELECT id, title, publication_date, image FROM news WHERE title LIKE $3 ORDER BY publication_date DESC OFFSET $1 LIMIT $2", offset, limit, query)
 	if err != nil {
-		return res, err
+		return res, 0, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -52,7 +45,7 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 		var image sql.NullString
 		err = rows.Scan(&temp.ID, &temp.Title, &temp.PublicationDate, &image)
 		if err != nil {
-			return res, err
+			return res, 0, err
 		}
 		if image.Valid {
 			temp.Image = image.String
@@ -60,7 +53,10 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 		res = append(res, temp)
 	}
 
-	return res, nil
+	count := 0
+	err = db.conn.QueryRow("SELECT COUNT(*) FROM news WHERE title LIKE $1", query).Scan(&count)
+
+	return res, count, err
 }
 
 func (db *NewsDBImpl) GetNewsById(id string) (*model.News, error) {

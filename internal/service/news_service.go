@@ -33,16 +33,10 @@ type NewsServiceImpl struct {
 
 func (s *NewsServiceImpl) GetNewsList(r requests.GetNewsListRequest) (responses.GetNewsListResponse, error) {
 	var res responses.GetNewsListResponse
-	newsList, err := s.db.GetNewsList(r.Offset, r.Limit, r.Query)
+	newsList, newsCount, err := s.db.GetNewsList(r.Offset, r.Limit, r.Query)
 	if err != nil {
 		return res, err
 	}
-
-	newsCount, err := s.db.GetNewsCount()
-	if err != nil {
-		return res, err
-	}
-
 	res.NewsList = newsList
 	res.Count = newsCount
 

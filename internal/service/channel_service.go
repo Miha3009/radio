@@ -37,12 +37,13 @@ type ChannelServiceImpl struct {
 
 func (s *ChannelServiceImpl) GetChannels(r requests.GetChannelsRequest) (responses.GetChannelsResponse, error) {
 	var res responses.GetChannelsResponse
-	channels, err := s.db.GetChannels(r.Offset, r.Limit, r.Query, r.Status)
+	channels, channelsCount, err := s.db.GetChannels(r.Offset, r.Limit, r.Query, r.Status)
 	if err != nil {
 		return res, err
 	}
 
 	res.Channels = channels
+	res.Count = channelsCount
 
 	return res, nil
 }

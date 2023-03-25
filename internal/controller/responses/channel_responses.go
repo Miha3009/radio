@@ -7,6 +7,7 @@ import (
 
 type GetChannelsResponse struct {
 	Channels []model.ChannelShortInfo `json:"channels"`
+	Count    int                      `json:"count"`
 }
 
 type GetChannelResponse struct {

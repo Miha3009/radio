@@ -77,16 +77,11 @@ func (s *TrackServiceImpl) GetTrack(r requests.GetTrackRequest) (responses.GetTr
 
 func (s *TrackServiceImpl) GetTrackList(r requests.GetTrackListRequest) (responses.GetTrackListResponse, error) {
 	var res responses.GetTrackListResponse
-	tracks, err := s.db.GetTrackList(r.Offset, r.Limit, r.Query)
+	tracks, tracksCount, err := s.db.GetTrackList(r.Offset, r.Limit, r.Query)
 	if err != nil {
 		return res, err
 	}
 	res.Tracks = tracks
-
-	tracksCount, err := s.db.GetTracksCount()
-	if err != nil {
-		return res, err
-	}
 	res.Count = tracksCount
 
 	return res, nil

@@ -9,7 +9,7 @@ import (
 )
 
 type ChannelDB interface {
-	GetChannels(offset, limit int, query, status string) ([]model.ChannelShortInfo, error)
+	GetChannels(offset, limit int, query, status string) ([]model.ChannelShortInfo, int, error)
 	GetChannelById(id string) (*model.ChannelInfo, error)
 	GetCurrentTrack(id string) (*model.Track, error)
 	CreateChannel(channel model.ChannelInfo) (int, error)
@@ -29,7 +29,7 @@ type ChannelDBImpl struct {
 	conn *sql.DB
 }
 
-func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([]model.ChannelShortInfo, error) {
+func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([]model.ChannelShortInfo, int, error) {
 	res := make([]model.ChannelShortInfo, 0)
 	statusString := ""
 	if status == "active" {
@@ -40,7 +40,7 @@ func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([
 	query = "%" + query + "%"
 	rows, err := db.conn.Query(fmt.Sprintf("SELECT id, title, logo FROM channels WHERE title LIKE $3%s ORDER BY id OFFSET $1 LIMIT $2", statusString), offset, limit, query)
 	if err != nil {
-		return res, err
+		return res, 0, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -48,7 +48,7 @@ func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([
 		var logo sql.NullString
 		err = rows.Scan(&temp.ID, &temp.Title, &logo)
 		if err != nil {
-			return res, err
+			return res, 0, err
 		}
 		if logo.Valid {
 			temp.Logo = logo.String
@@ -56,7 +56,10 @@ func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([
 		res = append(res, temp)
 	}
 
-	return res, nil
+	count := 0
+	err = db.conn.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM channels WHERE title LIKE $1%s", statusString), query).Scan(&count)
+
+	return res, count, err
 }
 
 func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {

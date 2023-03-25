@@ -9,9 +9,8 @@ import (
 )
 
 type TrackDB interface {
-	GetTracksCount() (int, error)
 	GetTrackById(id string) (*model.Track, error)
-	GetTrackList(offset, limit int, query string) ([]model.Track, error)
+	GetTrackList(offset, limit int, query string) ([]model.Track, int, error)
 	CreateTrack(track model.Track) (int, error)
 	UpdateTrack(track model.Track) error
 	DeleteTrack(id string) error
@@ -33,12 +32,6 @@ func NewTrackDB() TrackDB {
 
 type TrackDBImpl struct {
 	conn *sql.DB
-}
-
-func (db *TrackDBImpl) GetTracksCount() (int, error) {
-	count := 0
-	err := db.conn.QueryRow("SELECT COUNT(*) FROM tracks").Scan(&count)
-	return count, err
 }
 
 func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
@@ -64,12 +57,12 @@ func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 	return nil, nil
 }
 
-func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Track, error) {
+func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Track, int, error) {
 	res := make([]model.Track, 0)
 	query = "%" + query + "%"
 	rows, err := db.conn.Query("SELECT id, title, performancer, year, audio, duration FROM tracks WHERE title LIKE $3 OFFSET $1 LIMIT $2", offset, limit, query)
 	if err != nil {
-		return res, err
+		return res, 0, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -78,7 +71,7 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 		var duration sql.NullInt64
 		err = rows.Scan(&temp.ID, &temp.Title, &temp.Performancer, &temp.Year, &audio, &duration)
 		if err != nil {
-			return res, err
+			return res, 0, err
 		}
 		if audio.Valid {
 			temp.Audio = audio.String
@@ -89,7 +82,10 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 		res = append(res, temp)
 	}
 
-	return res, nil
+	count := 0
+	err = db.conn.QueryRow("SELECT COUNT(*) FROM tracks WHERE title LIKE $1", query).Scan(&count)
+
+	return res, count, err
 }
 
 func (db *TrackDBImpl) CreateTrack(track model.Track) (int, error) {
