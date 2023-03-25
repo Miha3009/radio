@@ -37,7 +37,7 @@ pc.ontrack = function (event) {
 
 window.startSession = () => {
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "http://5.159.101.107:8080/channel/2/connect");
+  xhr.open("POST", "http://46.148.238.204:8080/channel/2/connect");
   xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
   console.log(localDescription);
   xhr.send(JSON.stringify({sdp: localDescription.sdp}));

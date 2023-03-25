@@ -26,8 +26,8 @@ func StartAllChannels() {
 		ICEServers: []webrtc.ICEServer{
 			{
 				URLs:           []string{"turn:relay.metered.ca:443"},
-				Username:       "a9067dff0bdee1097e961805",
-				Credential:     "btIRqKUbbhxsazf3",
+				Username:       "72572597ae7d4797af60789a",
+				Credential:     "sWrcoUXDRy2SqIly",
 				CredentialType: webrtc.ICECredentialTypePassword,
 			},
 		},
