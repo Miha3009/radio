@@ -7,6 +7,7 @@ import (
 	"netradio/internal/controller/responses"
 	"netradio/internal/model"
 	"netradio/internal/repository"
+	"netradio/pkg/stats"
 	"os"
 	"strconv"
 	"time"
@@ -143,8 +144,10 @@ func (s *TrackServiceImpl) UpdateTrack(r requests.UpdateTrackRequest) (responses
 
 func (s *TrackServiceImpl) LikeTrack(r requests.LikeTrackRequest) error {
 	if r.Like {
+		stats.AddLike(r.ID)
 		return s.db.LikeTrack(r.ID, strconv.Itoa(r.UserID))
 	} else {
+		stats.RemoveLike(r.ID)
 		return s.db.UnlikeTrack(r.ID, strconv.Itoa(r.UserID))
 	}
 }

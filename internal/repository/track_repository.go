@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"strconv"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type TrackDB interface {
 	CommentTrack(id, commentId string) error
 	ChangeTrackAudio(id, audio string, duration time.Duration) error
 	LikeCount(id string) (int, error)
+	GetLikesList() ([]string, []int, error)
 }
 
 func NewTrackDB() TrackDB {
@@ -168,4 +170,27 @@ func (db *TrackDBImpl) LikeCount(id string) (int, error) {
 	var count int
 	err := db.conn.QueryRow("SELECT COUNT(*) FROM tracks_likes WHERE trackid=$1", id).Scan(&count)
 	return count, err
+}
+
+func (db *TrackDBImpl) GetLikesList() ([]string, []int, error) {
+	rows, err := db.conn.Query("SELECT trackid, COUNT(*) FROM tracks_likes GROUP BY trackid")
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+	tracks := make([]string, 0)
+	likes := make([]int, 0)
+	for rows.Next() {
+		like := 0
+		track := 0
+		err = rows.Scan(&track, &like)
+		if err != nil {
+			return tracks, likes, err
+		}
+		tracks = append(tracks, strconv.Itoa(track))
+		likes = append(likes, like)
+	}
+
+	return tracks, likes, nil
+
 }

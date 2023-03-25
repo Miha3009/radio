@@ -7,6 +7,7 @@ import (
 	"netradio/pkg/files"
 	"netradio/pkg/handlers"
 	"netradio/pkg/jwt"
+	"netradio/pkg/stats"
 	"netradio/pkg/webrtc"
 	"os"
 	"os/signal"
@@ -42,6 +43,7 @@ func main() {
 
 	jwt.SetConfig(cfg.Jwt)
 	email.SetConfig(cfg.Email)
+	stats.Init()
 
 	userDB := repository.NewUserDB()
 

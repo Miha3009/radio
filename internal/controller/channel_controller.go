@@ -10,13 +10,11 @@ import (
 	"netradio/pkg/context"
 	"netradio/pkg/files"
 	"netradio/pkg/handlers"
-	"netradio/pkg/log"
-	webrtchelper "netradio/pkg/webrtc"
+	webrtc "netradio/pkg/webrtc"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/pion/webrtc/v3"
 	"golang.org/x/net/websocket"
 )
 
@@ -289,121 +287,6 @@ func HandleScheduleRange(ctx context.Context) (any, error) {
 	return res, nil
 }
 
-type ConnectStruct struct {
-	ID string
-}
-
-func (s *ConnectStruct) HandleConnectChannel(ws *websocket.Conn) {
-	logger := log.NewLogger()
-	peerConnection, err := webrtc.NewPeerConnection(webrtchelper.GetPeerConfig())
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-
-	peerConnection.OnICECandidate(func(c *webrtc.ICECandidate) {
-		if c == nil {
-			return
-		}
-
-		outbound, marshalErr := json.Marshal(c.ToJSON())
-		if marshalErr != nil {
-			logger.Error(marshalErr)
-			return
-		}
-
-		if _, err = ws.Write(outbound); err != nil {
-			logger.Error(err)
-			return
-		}
-	})
-
-	peerConnection.OnDataChannel(func(d *webrtc.DataChannel) {
-		d.OnOpen(func() {
-			for range time.Tick(time.Second * 3) {
-				if err = d.SendText(time.Now().String()); err != nil {
-					logger.Error(err)
-					return
-				}
-			}
-		})
-	})
-
-	track, err := webrtchelper.GetAudioTrack(s.ID)
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-
-	rtpSender, err := peerConnection.AddTrack(track)
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-
-	go func() {
-		rtcpBuf := make([]byte, 1500)
-		for {
-			if _, _, rtcpErr := rtpSender.Read(rtcpBuf); rtcpErr != nil {
-				return
-			}
-		}
-	}()
-
-	for {
-		buf := make([]byte, 10000)
-
-		n, err := ws.Read(buf)
-		if err != nil {
-			logger.Error(err)
-			return
-		}
-
-		var (
-			candidate webrtc.ICECandidateInit
-			offer     webrtc.SessionDescription
-		)
-
-		switch {
-		case json.Unmarshal(buf[:n], &offer) == nil && offer.SDP != "":
-			if err = peerConnection.SetRemoteDescription(offer); err != nil {
-				logger.Error(err)
-				return
-			}
-
-			answer, answerErr := peerConnection.CreateAnswer(nil)
-			if answerErr != nil {
-				logger.Error(answerErr)
-				return
-			}
-
-			if err = peerConnection.SetLocalDescription(answer); err != nil {
-				logger.Error(err)
-				return
-			}
-
-			outbound, marshalErr := json.Marshal(answer)
-			if marshalErr != nil {
-				logger.Error(marshalErr)
-				return
-			}
-
-			if _, err = ws.Write(outbound); err != nil {
-				logger.Error(err)
-				return
-			}
-		case json.Unmarshal(buf[:n], &candidate) == nil && candidate.Candidate != "":
-			if err = peerConnection.AddICECandidate(candidate); err != nil {
-				logger.Error(err)
-				return
-			}
-		default:
-			fmt.Println("Unknown message")
-			return
-		}
-	}
-}
-
 func RouteChannelPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -423,7 +306,7 @@ func RouteChannelPaths(
 
 	router.HandleFunc("/channel/{id}/connect",
 		func(w http.ResponseWriter, req *http.Request) {
-			conn := ConnectStruct{chi.URLParam(req, "id")}
+			conn := webrtc.ConnectStruct{ID: chi.URLParam(req, "id")}
 			s := websocket.Server{Handler: websocket.Handler(conn.HandleConnectChannel)}
 			s.ServeHTTP(w, req)
 		})
