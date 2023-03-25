@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"netradio/internal/model"
 	"netradio/internal/repository"
 	"netradio/pkg/log"
 	"netradio/pkg/stats"
@@ -47,6 +48,7 @@ func StartAllChannels() {
 	}
 
 	for _, channel := range channels {
+		stats.SetChannelStatus(channel.ID, channel.Status)
 		go StartChannel(channel.ID)
 	}
 }
@@ -63,6 +65,10 @@ func StartChannel(channelID string) {
 	channelsToTrackTime[channelID] = &currentTime
 
 	for {
+		for stats.GetChannelStatus(channelID) != model.ActiveChannel {
+			time.Sleep(time.Second)
+		}
+
 		track, err := repository.NewChannelDB().GetCurrentTrack(channelID)
 		if err != nil {
 			log.NewLogger().Error(err)
@@ -94,6 +100,9 @@ func StartChannel(channelID string) {
 		for ; true; <-ticker.C {
 			pageData, pageHeader, err := ogg.ParseNextPage()
 			if errors.Is(err, io.EOF) {
+				break
+			}
+			if stats.GetChannelStatus(channelID) != model.ActiveChannel {
 				break
 			}
 

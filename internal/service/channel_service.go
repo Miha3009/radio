@@ -6,6 +6,7 @@ import (
 	"netradio/internal/controller/responses"
 	"netradio/internal/model"
 	"netradio/internal/repository"
+	"netradio/pkg/stats"
 	webrtchelper "netradio/pkg/webrtc"
 	"strconv"
 )
@@ -117,10 +118,12 @@ func (s *ChannelServiceImpl) UpdateChannel(r requests.UpdateChannelRequest) (res
 }
 
 func (s *ChannelServiceImpl) StartChannel(r requests.StartChannelRequest) error {
+	stats.SetChannelStatus(r.ID, model.ActiveChannel)
 	return s.db.ChangeChannelStatus(r.ID, model.ActiveChannel)
 }
 
 func (s *ChannelServiceImpl) StopChannel(r requests.StopChannelRequest) error {
+	stats.SetChannelStatus(r.ID, model.StoppedChannel)
 	return s.db.ChangeChannelStatus(r.ID, model.StoppedChannel)
 }
 

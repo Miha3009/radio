@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"netradio/internal/model"
 	"netradio/internal/repository"
 	"netradio/pkg/log"
 	"sync"
@@ -13,6 +14,8 @@ var (
 	trackLock           sync.RWMutex
 	trackForChannel     map[string]string
 	trackForChannelLock sync.RWMutex
+	channelStatuses     map[string]model.ChannelStatus
+	channelStatusesLock sync.RWMutex
 )
 
 func Init() {
@@ -22,6 +25,8 @@ func Init() {
 	trackLock = sync.RWMutex{}
 	trackForChannel = make(map[string]string, 0)
 	trackForChannelLock = sync.RWMutex{}
+	channelStatuses = make(map[string]model.ChannelStatus, 0)
+	channelStatusesLock = sync.RWMutex{}
 
 	tracks, likes, err := repository.NewTrackDB().GetLikesList()
 	if err != nil {
@@ -106,5 +111,21 @@ func GetTrackForChannel(channelID string) string {
 		return res
 	} else {
 		return ""
+	}
+}
+
+func SetChannelStatus(channelID string, status model.ChannelStatus) {
+	channelStatusesLock.Lock()
+	defer channelStatusesLock.Unlock()
+	channelStatuses[channelID] = status
+}
+
+func GetChannelStatus(channelID string) model.ChannelStatus {
+	channelStatusesLock.RLock()
+	defer channelStatusesLock.RUnlock()
+	if status, ok := channelStatuses[channelID]; ok {
+		return status
+	} else {
+		return model.StoppedChannel
 	}
 }

@@ -18,9 +18,10 @@ const (
 )
 
 type ChannelShortInfo struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
-	Logo  string `json:"logo"`
+	ID     string        `json:"id"`
+	Title  string        `json:"title"`
+	Logo   string        `json:"logo"`
+	Status ChannelStatus `json:"status"`
 }
 
 type ScheduleTrack struct {

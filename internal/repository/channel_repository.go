@@ -38,7 +38,7 @@ func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([
 		statusString = " AND status=0"
 	}
 	query = "%" + query + "%"
-	rows, err := db.conn.Query(fmt.Sprintf("SELECT id, title, logo FROM channels WHERE title LIKE $3%s ORDER BY id OFFSET $1 LIMIT $2", statusString), offset, limit, query)
+	rows, err := db.conn.Query(fmt.Sprintf("SELECT id, title, logo, status FROM channels WHERE title LIKE $3%s ORDER BY id OFFSET $1 LIMIT $2", statusString), offset, limit, query)
 	if err != nil {
 		return res, 0, err
 	}
@@ -46,7 +46,7 @@ func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([
 	for rows.Next() {
 		var temp model.ChannelShortInfo
 		var logo sql.NullString
-		err = rows.Scan(&temp.ID, &temp.Title, &logo)
+		err = rows.Scan(&temp.ID, &temp.Title, &logo, &temp.Status)
 		if err != nil {
 			return res, 0, err
 		}
