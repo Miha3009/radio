@@ -248,3 +248,25 @@ INSERT INTO news_comments (newsid, commentid) VALUES
   (3, 1), (3, 6), (3, 2), (3, 4), (3, 5), 
   (4, 1), (4, 6), (4, 2), (4, 3), (4, 5);
 
+INSERT INTO listeners_stat (channelid, time, count) VALUES
+  (1, NOW() - interval '10' second, 1),
+  (1, NOW() - interval '20' second, 2),
+  (1, NOW() - interval '30' second, 3),
+  (1, NOW() - interval '40' second, 5),
+  (1, NOW() - interval '50' second, 5),
+  (1, NOW() - interval '60' second, 5),
+  (1, NOW() - interval '70' second, 6),
+  (1, NOW() - interval '80' second, 7),
+  (1, NOW() - interval '90' second, 4),
+  (1, NOW() - interval '100' second, 5),
+  (1, NOW() - interval '110' second, 3),
+  (1, NOW() - interval '120' second, 6),
+  (1, NOW() - interval '130' second, 5),
+  (1, NOW() - interval '140' second, 4),
+  (1, NOW() - interval '150' second, 3),
+  (1, NOW() - interval '160' second, 6),
+  (1, NOW() - interval '170' second, 5),
+  (1, NOW() - interval '180' second, 4),
+  (1, NOW() - interval '190' second, 2),
+  (1, NOW() - interval '200' second, 1);
+
