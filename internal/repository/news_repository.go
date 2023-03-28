@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"netradio/pkg/files"
 	"time"
 )
 
@@ -48,7 +49,7 @@ func (db *NewsDBImpl) GetNewsList(offset, limit int, query string) ([]model.News
 			return res, 0, err
 		}
 		if image.Valid {
-			temp.Image = image.String
+			temp.Image = files.ToURL(image.String)
 		}
 		res = append(res, temp)
 	}
@@ -70,7 +71,7 @@ func (db *NewsDBImpl) GetNewsById(id string) (*model.News, error) {
 		var image sql.NullString
 		err = rows.Scan(&res.ID, &res.Title, &res.Content, &res.PublicationDate, &image)
 		if image.Valid {
-			res.Image = image.String
+			res.Image = files.ToURL(image.String)
 		}
 		return &res, err
 	}
@@ -134,7 +135,7 @@ func (db *NewsDBImpl) GetNewsComments(id string) ([]model.Comment, error) {
 			return res, err
 		}
 		if avatar.Valid {
-			temp.UserAvatar = avatar.String
+			temp.UserAvatar = files.ToURL(avatar.String)
 		}
 		if parent.Valid {
 			temp.Parent = int(parent.Int32)

@@ -6,9 +6,8 @@ import (
 	"netradio/internal/controller/responses"
 	"netradio/internal/model"
 	"netradio/internal/repository"
+	"netradio/pkg/hls"
 	"netradio/pkg/stats"
-	"netradio/pkg/webrtc"
-	webrtchelper "netradio/pkg/webrtc"
 	"strconv"
 )
 
@@ -84,7 +83,7 @@ func (s *ChannelServiceImpl) CreateChannel(r requests.CreateChannelRequest) (res
 	}
 	res.ID = strconv.Itoa(id)
 
-	webrtc.StartChannel(res.ID)
+	hls.StartChannel(res.ID)
 	stats.SetChannelStatus(res.ID, channel.Status)
 	stats.RunForChannel(res.ID)
 
@@ -164,7 +163,7 @@ func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) 
 	res.Performancer = track.Performancer
 	res.Year = track.Year
 	res.Duration = track.Duration
-	res.CurrentTime = webrtchelper.GetCurrentTrackTime(r.ID)
+	res.CurrentTime = hls.GetCurrentTrackTime(r.ID)
 	res.Listeners = stats.GetListeners(r.ID)
 	likeCount, err := repository.NewTrackDB().LikeCount(res.ID)
 	if err != nil {

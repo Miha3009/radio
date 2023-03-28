@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"netradio/pkg/files"
 	"strconv"
 	"time"
 )
@@ -46,7 +47,7 @@ func (db *TrackDBImpl) GetTrackById(id string) (*model.Track, error) {
 		var duration sql.NullInt64
 		err = rows.Scan(&res.ID, &res.Title, &res.Performancer, &res.Year, &audio, &duration)
 		if audio.Valid {
-			res.Audio = audio.String
+			res.Audio = files.ToURL(audio.String)
 		}
 		if duration.Valid {
 			res.Duration = time.Duration(duration.Int64)
@@ -74,7 +75,7 @@ func (db *TrackDBImpl) GetTrackList(offset, limit int, query string) ([]model.Tr
 			return res, 0, err
 		}
 		if audio.Valid {
-			temp.Audio = audio.String
+			temp.Audio = files.ToURL(audio.String)
 		}
 		if duration.Valid {
 			temp.Duration = time.Duration(duration.Int64)
@@ -139,7 +140,7 @@ func (db *TrackDBImpl) GetTrackComments(id string) ([]model.Comment, error) {
 			return res, err
 		}
 		if avatar.Valid {
-			temp.UserAvatar = avatar.String
+			temp.UserAvatar = files.ToURL(avatar.String)
 		}
 		if parent.Valid {
 			temp.Parent = int(parent.Int32)

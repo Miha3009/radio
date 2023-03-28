@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"netradio/pkg/cloud"
 	"netradio/pkg/database"
 	"netradio/pkg/email"
 	"netradio/pkg/jwt"
@@ -20,6 +21,7 @@ type Config struct {
 	Jwt      jwt.Config      `yaml:"jwt"`
 	Database database.Config `yaml:"database"`
 	Email    email.Config    `yaml:"email"`
+	Cloud    cloud.Config    `yaml:"cloud"`
 }
 
 func NewConfigFromYAML(path string) (Config, error) {

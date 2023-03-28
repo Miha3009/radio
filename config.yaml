@@ -3,6 +3,9 @@ port: 8080
 jwt:
   secret_key: "secret_key"
 
+cloud:
+    bucket: "netradio"
+
 database:
   host: "localhost"
   port: 5432

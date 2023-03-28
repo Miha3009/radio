@@ -9,12 +9,10 @@ import (
 	"netradio/pkg/context"
 	"netradio/pkg/files"
 	"netradio/pkg/handlers"
-	webrtc "netradio/pkg/webrtc"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"golang.org/x/net/websocket"
 )
 
 func HandleGetChannels(ctx context.Context) (any, error) {
@@ -302,11 +300,4 @@ func RouteChannelPaths(
 	router.MethodFunc("GET", "/channel/{id}/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetCurrentTrack), core))
 	router.MethodFunc("GET", "/channel/{id}/schedule", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleSchedule), core))
 	router.MethodFunc("GET", "/channel/{id}/schedule-range", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleScheduleRange), core))
-
-	router.HandleFunc("/channel/{id}/connect",
-		func(w http.ResponseWriter, req *http.Request) {
-			conn := webrtc.ConnectStruct{ID: chi.URLParam(req, "id")}
-			s := websocket.Server{Handler: websocket.Handler(conn.HandleConnectChannel)}
-			s.ServeHTTP(w, req)
-		})
 }

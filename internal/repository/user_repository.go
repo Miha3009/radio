@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"netradio/pkg/files"
 	"time"
 )
 
@@ -41,7 +42,11 @@ func (db *UserDBImpl) GetUserByEmail(email string) (*model.User, error) {
 	}
 	defer rows.Close()
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Email, &res.Password, &res.Name, &res.Avatar, &res.Role)
+		var avatar sql.NullString
+		err = rows.Scan(&res.ID, &res.Email, &res.Password, &res.Name, &avatar, &res.Role)
+		if avatar.Valid {
+			res.Avatar = files.ToURL(avatar.String)
+		}
 		return &res, err
 	}
 
@@ -56,7 +61,11 @@ func (db *UserDBImpl) GetUserById(id string) (*model.User, error) {
 	}
 	defer rows.Close()
 	if rows.Next() {
-		err = rows.Scan(&res.ID, &res.Email, &res.Password, &res.Name, &res.Avatar, &res.Role)
+		var avatar sql.NullString
+		err = rows.Scan(&res.ID, &res.Email, &res.Password, &res.Name, &avatar, &res.Role)
+		if avatar.Valid {
+			res.Avatar = files.ToURL(avatar.String)
+		}
 		return &res, err
 	}
 

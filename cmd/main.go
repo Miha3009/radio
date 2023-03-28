@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"netradio/pkg/cloud"
 	"netradio/pkg/files"
 	"netradio/pkg/handlers"
+	"netradio/pkg/hls"
 	"netradio/pkg/jwt"
 	"netradio/pkg/stats"
-	"netradio/pkg/webrtc"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,6 +44,7 @@ func main() {
 
 	jwt.SetConfig(cfg.Jwt)
 	email.SetConfig(cfg.Email)
+	cloud.SetConfig(cfg.Cloud)
 	stats.Init()
 
 	userDB := repository.NewUserDB()
@@ -63,7 +65,7 @@ func main() {
 	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
 	controller.RouteStatsPaths(core, router)
-	webrtc.StartAllChannels()
+	hls.StartAllChannels()
 	files.StartFileServer(router)
 
 	server := &http.Server{}

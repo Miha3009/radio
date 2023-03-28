@@ -1,17 +1,16 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
 type User struct {
-	ID       int            `json:"id"`
-	Email    string         `json:"email"`
-	Password string         `json:"-"`
-	Name     string         `json:"name"`
-	Avatar   sql.NullString `json:"avatar"`
-	Role     UserRole       `json:"status"`
+	ID       int      `json:"id"`
+	Email    string   `json:"email"`
+	Password string   `json:"-"`
+	Name     string   `json:"name"`
+	Avatar   string   `json:"avatar"`
+	Role     UserRole `json:"status"`
 }
 
 type UserRole int

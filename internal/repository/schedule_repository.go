@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"netradio/pkg/files"
 	"strings"
 	"time"
 )
@@ -103,7 +104,7 @@ func ScanScheduleRows(rows *sql.Rows) ([]model.ScheduleTrackFull, error) {
 			return res, err
 		}
 		if audio.Valid {
-			track.Audio = audio.String
+			track.Audio = files.ToURL(audio.String)
 		}
 		if duration.Valid {
 			track.Duration = time.Duration(duration.Int64)

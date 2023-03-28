@@ -149,9 +149,7 @@ func HandleUserGet(ctx context.Context) (any, error) {
 	res.Name = user.Name
 	res.Email = user.Email
 	res.Role = int(user.Role)
-	if user.Avatar.Valid {
-		res.Avatar = user.Avatar.String
-	}
+	res.Avatar = user.Avatar
 
 	return res, nil
 }

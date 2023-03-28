@@ -1,11 +1,14 @@
 package files
 
 import (
-	"io"
+	"context"
+	"fmt"
 	"net/http"
-	"os"
+	"netradio/pkg/cloud"
 	"path/filepath"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
@@ -27,21 +30,21 @@ func Save(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	id := uuid.New()
+	id := uuid.New().String() + filepath.Ext(h.Filename)
 
-	defer f.Close()
-	_ = os.MkdirAll(basePath, os.ModePerm)
-	fullPath := basePath + "/" + id.String() + filepath.Ext(h.Filename)
-	file, err := os.OpenFile(fullPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, f)
+	client := cloud.GetClient()
+	_, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(cloud.GetBucket()),
+		Key:    aws.String(id),
+		Body:   f,
+	})
 	if err != nil {
 		return "", err
 	}
 
-	return fullPath, nil
+	return id, nil
+}
+
+func ToURL(id string) string {
+	return fmt.Sprintf("https://storage.yandexcloud.net/%s/%s", cloud.GetBucket(), id)
 }

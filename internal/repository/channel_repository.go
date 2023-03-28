@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"netradio/internal/model"
 	"netradio/pkg/database"
+	"netradio/pkg/files"
 	"time"
 )
 
@@ -51,7 +52,7 @@ func (db *ChannelDBImpl) GetChannels(offset, limit int, query, status string) ([
 			return res, 0, err
 		}
 		if logo.Valid {
-			temp.Logo = logo.String
+			temp.Logo = files.ToURL(logo.String)
 		}
 		res = append(res, temp)
 	}
@@ -76,7 +77,7 @@ func (db *ChannelDBImpl) GetChannelById(id string) (*model.ChannelInfo, error) {
 			return nil, err
 		}
 		if logo.Valid {
-			res.Logo = logo.String
+			res.Logo = files.ToURL(logo.String)
 		}
 
 		return &res, nil
@@ -100,7 +101,7 @@ func (db *ChannelDBImpl) GetCurrentTrack(id string) (*model.Track, error) {
 			return nil, err
 		}
 		if audio.Valid {
-			res.Audio = audio.String
+			res.Audio = files.ToURL(audio.String)
 		}
 		if duration.Valid {
 			res.Duration = time.Duration(duration.Int64)
