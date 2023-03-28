@@ -270,7 +270,7 @@ func HandleUploadAvatar(ctx context.Context) (any, error) {
 	}
 
 	var res responses.UpdateAvatarResponse
-	res.Avatar = path
+	res.Avatar = files.ToURL(path)
 
 	return res, nil
 }

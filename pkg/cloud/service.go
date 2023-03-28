@@ -15,7 +15,9 @@ var (
 	cfg    Config
 )
 
-func SetConfig(cfg Config) {
+func SetConfig(newCfg Config) {
+	cfg = newCfg
+
 	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		if service == s3.ServiceID && region == "ru-central1" {
 			return aws.Endpoint{
