@@ -44,7 +44,7 @@ func (s *TrackServiceImpl) GetTrack(r requests.GetTrackRequest) (responses.GetTr
 	}
 
 	res.Found = true
-	res.ID = strconv.Itoa(track.ID)
+	res.ID = track.ID
 	res.Title = track.Title
 	res.Performancer = track.Performancer
 	res.Year = track.Year

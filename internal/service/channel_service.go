@@ -164,7 +164,7 @@ func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) 
 		return res, errors.New("Track not found")
 	}
 
-	res.ID = strconv.Itoa(track.ID)
+	res.ID = track.ID
 	res.Title = track.Title
 	res.Performancer = track.Performancer
 	res.Year = track.Year
