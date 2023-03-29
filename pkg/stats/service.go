@@ -9,14 +9,16 @@ import (
 )
 
 var (
-	listeners           map[string]int
-	listenerLock        sync.RWMutex
-	trackLikes          map[string]int
-	trackLock           sync.RWMutex
-	trackForChannel     map[string]string
-	trackForChannelLock sync.RWMutex
-	channelStatuses     map[string]model.ChannelStatus
-	channelStatusesLock sync.RWMutex
+	listeners            map[string]int
+	listenerLock         sync.RWMutex
+	trackLikes           map[string]int
+	trackLock            sync.RWMutex
+	trackForChannel      map[string]string
+	trackForChannelLock  sync.RWMutex
+	channelStatuses      map[string]model.ChannelStatus
+	channelStatusesLock  sync.RWMutex
+	channelStreaming     map[string]bool
+	channelStreamingLock sync.RWMutex
 )
 
 func Init() {
@@ -28,6 +30,8 @@ func Init() {
 	trackForChannelLock = sync.RWMutex{}
 	channelStatuses = make(map[string]model.ChannelStatus, 0)
 	channelStatusesLock = sync.RWMutex{}
+	channelStreaming = make(map[string]bool, 0)
+	channelStreamingLock = sync.RWMutex{}
 
 	tracks, likes, err := repository.NewTrackDB().GetLikesList()
 	if err != nil {
@@ -148,5 +152,21 @@ func RunForChannel(channelID string) {
 			return
 		}
 		repository.NewStatsDB().AddListenerTimestamp(channelID, GetListeners(channelID))
+	}
+}
+
+func SetChannelStreaming(channelID string, streaming bool) {
+	channelStreamingLock.Lock()
+	defer channelStreamingLock.Unlock()
+	channelStreaming[channelID] = streaming
+}
+
+func GetChannelStreaming(channelID string) bool {
+	channelStreamingLock.RLock()
+	defer channelStreamingLock.RUnlock()
+	if streaming, ok := channelStreaming[channelID]; ok {
+		return streaming
+	} else {
+		return false
 	}
 }

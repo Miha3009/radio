@@ -15,12 +15,12 @@ import (
 )
 
 var (
-	channelsToTrackTime map[string]*time.Duration
+	channelsToTrackTime map[string]*time.Time
 	streaming           bool
 )
 
 func StartAllChannels(isStreaming bool) {
-	channelsToTrackTime = make(map[string]*time.Duration)
+	channelsToTrackTime = make(map[string]*time.Time)
 	streaming = isStreaming
 
 	channels, _, err := repository.NewChannelDB().GetChannels(0, 1000000, "", "")
@@ -37,9 +37,6 @@ func StartChannel(channelID string) {
 	if !streaming {
 		return
 	}
-
-	currentTime := time.Duration(0)
-	channelsToTrackTime[channelID] = &currentTime
 
 	f, err := os.Create(channelID + ".txt")
 	if err != nil {
@@ -61,6 +58,7 @@ func StartChannel(channelID string) {
 
 	var startTime time.Time
 	var duration time.Duration
+	channelsToTrackTime[channelID] = &startTime
 	for i := 0; i < 1000; {
 		if stats.GetChannelStatus(channelID) != model.ActiveChannel {
 			return
@@ -108,7 +106,7 @@ func StartChannel(channelID string) {
 			}(ctx)
 			startTime = time.Now()
 		} else {
-			time.Sleep(duration - time.Now().Sub(startTime) + time.Second*10)
+			time.Sleep(duration - time.Now().Sub(startTime) + time.Second*5)
 			startTime = startTime.Add(duration)
 		}
 		i += 1
@@ -117,5 +115,5 @@ func StartChannel(channelID string) {
 }
 
 func GetCurrentTrackTime(channelID string) time.Duration {
-	return *channelsToTrackTime[channelID]
+	return time.Now().Sub(*channelsToTrackTime[channelID])
 }

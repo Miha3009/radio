@@ -62,3 +62,11 @@ type GetScheduleRangeRequest struct {
 	From      time.Time
 	To        time.Time
 }
+
+type StartStreamRequest struct {
+	ID string
+}
+
+type StopStreamRequest struct {
+	ID string
+}

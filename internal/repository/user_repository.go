@@ -16,7 +16,7 @@ type UserDB interface {
 	CreateUser(user model.User) error
 	CreateSession(userID int, refreshToken string, expires time.Time, ip string) error
 	CreateVerificationCode(code model.VerificationCode) error
-	ChangeName(id, newName string) error
+	UpdateUser(user model.User) error
 	ChangeAvatar(id, newAvatar string) error
 	ChangePassword(id, newPassword string) error
 	DeleteUser(id string) error
@@ -121,8 +121,8 @@ func (db *UserDBImpl) CreateVerificationCode(code model.VerificationCode) error 
 	return err
 }
 
-func (db *UserDBImpl) ChangeName(id, newName string) error {
-	_, err := db.conn.Exec("UPDATE users SET name=$1 WHERE id=$2", newName, id)
+func (db *UserDBImpl) UpdateUser(user model.User) error {
+	_, err := db.conn.Exec("UPDATE users SET name=$1, email=$2 WHERE id=$3", user.Name, user.Email, user.ID)
 	return err
 }
 

@@ -275,6 +275,31 @@ func HandleUploadAvatar(ctx context.Context) (any, error) {
 	return res, nil
 }
 
+func HandleUpdateUser(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role == model.UserGuest {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.UpdateUserRequest
+	request.User = user
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusBadRequest)
+		return nil, err
+	}
+
+	err = service.NewUserService().UpdateUser(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func RouteUserPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -289,4 +314,5 @@ func RouteUserPaths(
 	router.MethodFunc("GET", "/reset-password/verify-code", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleResetPasswordVerifyCode), core))
 	router.MethodFunc("POST", "/reset-password/change", handlers.MakeHandler(HandleResetPasswordChange, core))
 	router.MethodFunc("POST", "/upload-avatar", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleUploadAvatar), core))
+	router.MethodFunc("PATCH", "/user", handlers.MakeHandler(HandleUpdateUser, core))
 }

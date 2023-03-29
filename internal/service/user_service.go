@@ -23,6 +23,7 @@ type UserService interface {
 	ResetPasswordVerifyCode(r requests.ResetPasswordVerifyCodeRequest) (responses.ResetPasswordVerifyCodeResponse, error)
 	ResetPasswordChange(r requests.ResetPasswordChangeRequest) (responses.ResetPasswordChangeResponse, error)
 	UploadAvatar(r requests.UploadAvatarRequest) error
+	UpdateUser(r requests.UpdateUserRequest) error
 }
 
 func NewUserService() UserService {
@@ -215,4 +216,15 @@ func (s *UserServiceImpl) ResetPasswordChange(r requests.ResetPasswordChangeRequ
 
 func (s *UserServiceImpl) UploadAvatar(r requests.UploadAvatarRequest) error {
 	return s.db.ChangeAvatar(r.UserID, r.Avatar)
+}
+
+func (s *UserServiceImpl) UpdateUser(r requests.UpdateUserRequest) error {
+	if r.Email != nil {
+		r.User.Email = *r.Email
+	}
+	if r.Name != nil {
+		r.User.Name = *r.Name
+	}
+
+	return s.db.UpdateUser(r.User)
 }

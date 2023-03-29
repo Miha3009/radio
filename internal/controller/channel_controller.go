@@ -284,6 +284,44 @@ func HandleScheduleRange(ctx context.Context) (any, error) {
 	return res, nil
 }
 
+func HandleStartStream(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.StartStreamRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	err := service.NewChannelService().StartStream(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func HandleStopStream(ctx context.Context) (any, error) {
+	user := ctx.GetUser()
+	if user.Role != model.UserAdministrator {
+		ctx.GetResponseWriter().WriteHeader(http.StatusUnauthorized)
+		return nil, nil
+	}
+
+	var request requests.StopStreamRequest
+	request.ID = chi.URLParam(ctx.GetRequest(), "id")
+
+	err := service.NewChannelService().StopStream(request)
+	if err != nil {
+		ctx.GetResponseWriter().WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func RouteChannelPaths(
 	core handlers.Core,
 	router chi.Router,
@@ -300,4 +338,6 @@ func RouteChannelPaths(
 	router.MethodFunc("GET", "/channel/{id}/track", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleGetCurrentTrack), core))
 	router.MethodFunc("GET", "/channel/{id}/schedule", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleSchedule), core))
 	router.MethodFunc("GET", "/channel/{id}/schedule-range", handlers.MakeHandler(handlers.MakeJSONWrapper(HandleScheduleRange), core))
+	router.MethodFunc("POST", "/channel/{id}/start-stream", handlers.MakeHandler(HandleStartStream, core))
+	router.MethodFunc("POST", "/channel/{id}/stop-stream", handlers.MakeHandler(HandleStopStream, core))
 }

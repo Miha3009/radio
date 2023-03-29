@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"netradio/internal/controller/requests"
 	"netradio/internal/controller/responses"
 	"netradio/internal/model"
@@ -24,6 +25,8 @@ type ChannelService interface {
 	GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error)
 	GetSchedule(r requests.GetScheduleRequest) (responses.GetScheduleResponse, error)
 	GetScheduleRange(r requests.GetScheduleRangeRequest) (responses.GetScheduleRangeResponse, error)
+	StartStream(r requests.StartStreamRequest) error
+	StopStream(r requests.StopStreamRequest) error
 }
 
 func NewChannelService() ChannelService {
@@ -182,6 +185,11 @@ func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) 
 	} else {
 		res.Liked = false
 	}
+	if stats.GetChannelStreaming(r.ID) {
+		res.HLS = fmt.Sprintf("/app/channel%sstream/llhls.m3u8", r.ID)
+	} else {
+		res.HLS = fmt.Sprintf("/app/channel%s/llhls.m3u8", r.ID)
+	}
 
 	return res, nil
 }
@@ -212,4 +220,14 @@ func (s *ChannelServiceImpl) GetScheduleRange(r requests.GetScheduleRangeRequest
 	res.Tracks = tracks
 
 	return res, nil
+}
+
+func (s *ChannelServiceImpl) StartStream(r requests.StartStreamRequest) error {
+	stats.SetChannelStreaming(r.ID, true)
+	return nil
+}
+
+func (s *ChannelServiceImpl) StopStream(r requests.StopStreamRequest) error {
+	stats.SetChannelStreaming(r.ID, false)
+	return nil
 }

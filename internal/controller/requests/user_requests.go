@@ -1,5 +1,7 @@
 package requests
 
+import "netradio/internal/model"
+
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -41,4 +43,10 @@ type ResetPasswordChangeRequest struct {
 type UploadAvatarRequest struct {
 	UserID string
 	Avatar string
+}
+
+type UpdateUserRequest struct {
+	User  model.User
+	Name  *string `json:"name,omitempty"`
+	Email *string `json:"email,omitempty"`
 }
