@@ -11,7 +11,7 @@ import (
 )
 
 type ScheduleDB interface {
-	AddTrackToSchedule(channelid, trackid string, start, end time.Time) error
+	AddTracksToSchedule([]model.ScheduleTrack) error
 	GetPastTracks(id string, count int) ([]model.ScheduleTrackFull, error)
 	GetNextTracks(id string, count int) ([]model.ScheduleTrackFull, error)
 	GetTracksInRange(id string, from, to time.Time) ([]model.ScheduleTrackFull, error)
@@ -29,9 +29,28 @@ type ScheduleDBImpl struct {
 	conn *sql.DB
 }
 
-func (db *ScheduleDBImpl) AddTrackToSchedule(channelid, trackid string, start, end time.Time) error {
-	fmt.Println(channelid, trackid, start, end)
-	_, err := db.conn.Exec("INSERT INTO schedule (channelid, trackid, startdate, enddate) VALUES ($1, $2, $3, $4)", channelid, trackid, start, end)
+func (db *ScheduleDBImpl) AddTracksToSchedule(tracks []model.ScheduleTrack) error {
+	tx, err := db.conn.Begin()
+
+	valueStrings := []string{}
+	valueArgs := []interface{}{}
+	for i, track := range tracks {
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d::integer, $%d::integer, $%d::timestamp, $%d::timestamp)", i*4+1, i*4+2, i*4+3, i*4+4))
+		valueArgs = append(valueArgs, track.ChannelId)
+		valueArgs = append(valueArgs, track.TrackId)
+		valueArgs = append(valueArgs, track.StartDate)
+		valueArgs = append(valueArgs, track.EndDate)
+	}
+
+	stmt := fmt.Sprintf("INSERT INTO schedule (channelid, trackid, startdate, enddate) VALUES %s", strings.Join(valueStrings, ","))
+	_, err = tx.Exec(stmt, valueArgs...)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+
 	return err
 }
 

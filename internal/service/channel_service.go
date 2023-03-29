@@ -145,7 +145,10 @@ func (s *ChannelServiceImpl) UploadLogo(r requests.UploadLogoRequest) (responses
 }
 
 func (s *ChannelServiceImpl) AddTrack(r requests.AddTrackToScheduleRequest) error {
-	return repository.NewScheduleDB().AddTrackToSchedule(r.ChannelID, r.TrackID, r.StartDate, r.EndDate)
+	for i := range r.Tracks {
+		r.Tracks[i].ChannelId = r.ChannelID
+	}
+	return repository.NewScheduleDB().AddTracksToSchedule(r.Tracks)
 }
 
 func (s *ChannelServiceImpl) GetCurrentTrack(r requests.GetCurrentTrackRequest) (responses.GetCurrentTrackResponse, error) {
