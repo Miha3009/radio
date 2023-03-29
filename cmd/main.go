@@ -65,7 +65,7 @@ func main() {
 	controller.RouteTrackPaths(core, router)
 	controller.RouteNewsPaths(core, router)
 	controller.RouteStatsPaths(core, router)
-	hls.StartAllChannels()
+	hls.StartAllChannels(cfg.Streaming)
 	files.StartFileServer(router)
 
 	server := &http.Server{}

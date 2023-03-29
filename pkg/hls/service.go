@@ -10,10 +10,12 @@ import (
 
 var (
 	channelsToTrackTime map[string]*time.Duration
+	streaming           bool
 )
 
-func StartAllChannels() {
+func StartAllChannels(isStreaming bool) {
 	channelsToTrackTime = make(map[string]*time.Duration)
+	streaming = isStreaming
 
 	channels, _, err := repository.NewChannelDB().GetChannels(0, 1000000, "", "")
 	if err != nil {
@@ -26,6 +28,9 @@ func StartAllChannels() {
 }
 
 func StartChannel(channelID string) {
+	if !streaming {
+		return
+	}
 	currentTime := time.Duration(0)
 	channelsToTrackTime[channelID] = &currentTime
 

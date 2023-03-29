@@ -17,11 +17,12 @@ const (
 )
 
 type Config struct {
-	Port     int             `yaml:"port"`
-	Jwt      jwt.Config      `yaml:"jwt"`
-	Database database.Config `yaml:"database"`
-	Email    email.Config    `yaml:"email"`
-	Cloud    cloud.Config    `yaml:"cloud"`
+	Port      int             `yaml:"port"`
+	Jwt       jwt.Config      `yaml:"jwt"`
+	Database  database.Config `yaml:"database"`
+	Email     email.Config    `yaml:"email"`
+	Cloud     cloud.Config    `yaml:"cloud"`
+	Streaming bool            `yaml:"streaming"`
 }
 
 func NewConfigFromYAML(path string) (Config, error) {
