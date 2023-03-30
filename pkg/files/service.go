@@ -46,5 +46,8 @@ func Save(r *http.Request) (string, error) {
 }
 
 func ToURL(id string) string {
+	if id == "" {
+		return id
+	}
 	return fmt.Sprintf("https://storage.yandexcloud.net/%s/%s", cloud.GetBucket(), id)
 }
